@@ -69,7 +69,7 @@
             <view class="intervalrow"></view>
             <view class="advicecontanier">
                 <view class="advicecontanier0">
-                    <textarea class="adivcecontent" placeholder="审批意见" placeholder-class="placeholder"></textarea>
+                    <textarea class="adivcecontent" placeholder="审批意见" placeholder-class="placeholder">{{comments}}</textarea>
                     <view>
                         <image src="../../../resource/image/newicon/u167.png" class="tagicon"></image>
                         <image src="../../../resource/image/newicon/u169.png" class="tagicon" style="margin-top: 20rpx"></image>

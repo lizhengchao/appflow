@@ -61,7 +61,7 @@ Page({
         comments: '', //审批意见
         signid: '', //签章id，暂时未做签章
         currentnodes: [], //当前已选择的下级节点
-        currentnodeactors: [] //当前已选择的下级节点办理人
+        currentnodeactors: [] //当前已选择的下级节点办理人,多个节点，每个节点对应对个办理人
     },
     onLoad: function(obj){
         var me = this;
@@ -180,7 +180,7 @@ Page({
             taskInfo: me.data.taskInfo
         })
         
-        //如果当前节点需要选择下级办理人
+        //如果当前节点需要选择下级办理人，则展示下级办理人页面
         if(currentnode.designate_actor && currentnode.checkbox == 2){
             me.data.nodedisplay.nodecontanier = 'block';
         } else if (currentnode.designate_actor && currentnode.checkbox == 0){
@@ -190,6 +190,15 @@ Page({
             nodedisplay: me.data.nodedisplay
         })
 
+        //加入到交互数据
+        if(currentnode.checkbox == 2){
+            me.data.currentnodes.push({
+                nodeid: currentnode.nodeid
+            });
+        } else {
+            me.data.currentnodes.remove();
+        }
+
     },
 
     //下级节点办理人选择按钮
@@ -197,10 +206,11 @@ Page({
         var me = this,
             taskInfo = me.data.taskInfo,
             id = e.currentTarget.id,
-            currentactor = taskInfo.nextNodeDesignateActor[id];
+            currentactor = taskInfo.nextNodeDesignateActor[id],
+            currentnodeactors = me.data.currentnodeactors;
         
         //更改checkbox显示
-        if(currentactor.checkbox == 0){
+        if(!currentactor.checkbox || currentactor.checkbox == 0){
             currentactor.checkbox = 2;
         } else {
             currentactor.checkbox = 0;
@@ -208,6 +218,20 @@ Page({
         this.setData({
             taskInfo: me.data.taskInfo
         })
+
+        //加入到交互数据
+        if(currentactor.checkbox == 2){
+            if(!currentnodeactors[currentactor.nodeid]){
+                currentnodeactors[currentactor.nodeid] = [];
+            }
+            var item = {
+                nodeid: currentactor.nodeid,
+                elecode: currentactor.elecode,
+                usercode: currentactor.usercode,
+                username: currentactor.username
+            };
+            currentnodeactors[currentactor.nodeid].push(item);
+        }
     },
 
     //“更多”按钮
@@ -225,7 +249,64 @@ Page({
 
     //“提交”按钮
     submitbtnTap: function(){
-        var a =1;
+        var me = this,
+            comments = me.data.comments,
+            signid = me.data.signid,
+            currentnodes = me.data.currentnodes,
+            currentnodeactors = me.data.currentnodeactors,
+            
+            issigature = me.data.taskInfo.taskInstInfo[0].issigature,
+            designate_node = me.data.taskInfo.taskInstInfo[0].designate_node,
+            
+            dealArray = [];//请求时办理人参数
+        
+        if(comments.length<=0){
+            wx.showToast({
+                title: "审批意见不能为空",
+                icon: 'success'
+            });
+            return;
+        }
+
+        if (issigature == 1 && !signid) {
+            wx.showToast({
+                title: "需要签章，请选择签章",
+                icon: 'success'
+            });
+            return;
+        }
+
+        if (designate_node == 1) {
+            if (currentnodes.length == 0) {
+                wx.showToast({
+                title: "需要指定下级节点",
+                icon: 'success'
+            });
+            return;
+            }
+        }
+
+        if (me.data.needPeople) { //需要指定下级节点办理人
+            for(var i=0; i<currentnodes.length; i++){
+                var node = currentnodes[i];
+                if (currentnodeactors[node.nodeid].length == 0) {
+                    wx.showToast({
+                        title: "未指定办理人",
+                        icon: 'success'
+                    });
+                } else {
+                    for(var i=0; i<currentnodeactors[node.nodeid]; i++){
+                        var person = currentnodeactors[node.nodeid][i];
+                        dealArray.push({nodeid: person.nodeid, elecode: person.elecode, usercode: person.usercode});
+                    };
+                }
+                if (returnFlg) {
+                    return false;
+                }
+            };
+            if (returnFlg) return;
+        }
+
     },
 
     ////////////////////////////自建方法/////////////////////////////////////////
