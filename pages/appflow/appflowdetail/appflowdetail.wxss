@@ -1,0 +1,247 @@
+.detailtabselcontainer {
+    background-color: #ebebeb;
+    width: 100%;
+    padding: 14rpx 0px;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+}
+
+.detailtabsel {
+    float: left;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.taskcontanier {
+    background-color: #ebebeb;
+    height: 85%;
+}
+
+.taskrow {
+    padding:16rpx 12rpx;
+    font-size: 30rpx;
+    background-color: #ffffff
+}
+
+.rowicon {
+    float: right;
+    height: 30rpx;
+    width: 30rpx
+}
+
+.intervalrow {
+    height: 20rpx;
+    background-color: #ebebeb;
+}
+
+.taskdetailcontanier {
+    border-top: 2rpx solid #ebebeb;
+    background-color: #ffffff
+}
+
+.taskdetailrow {
+    padding: 20rpx;
+    height: 50rpx;
+}
+
+.taskdetailrowname {
+    color:#aaa9a9;
+    font-size: 30rpx;
+    width: 30%;
+    float: left;
+}
+
+.taskdetailrowvalue {
+    color: #000000;
+    font-size: 30rpx;
+    float: left;
+    width: 70%
+}
+
+.historycontanier {
+    background-color: #ffffff;
+    color: #aaa9a9;
+    font-size: 30rpx;
+}
+
+.historyrow {
+    border-top: 2rpx solid #ebebeb;
+    padding: 20rpx;
+}
+
+.historytext {
+    width:25%;
+    padding-left: 60rpx;
+    float:left;
+}
+
+.historytext2 {
+    text-align:right;
+}
+
+.histortext3 {
+    padding-left: 60rpx;
+        background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("../../../resources/images/work/u22.png");
+}
+
+.advicecontanier {
+    padding: 20rpx;
+    background-color: #ffffff;
+    font-size: 30rpx;
+    
+    
+}
+
+.advicecontanier0 {
+    display: flex;
+    display: -webkit-flex; 
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.adivcecontent {
+    border: 2rpx solid #aaa9a9;
+    border-radius: 10rpx;
+    height: 124rpx;
+    width: 550rpx;
+    padding: 20rpx;
+}
+
+.advicecontanier1 {
+    margin-top: 10rpx;
+    display: flex;
+    display: -webkit-flex; 
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap
+}
+
+.advicebutton {
+    border:  1px solid #EECE91;
+    background-color: #FFF5E1;
+    height: 60rpx;
+    font-size: 30rpx;
+    line-height: 2
+}
+
+.tagicon {
+    width: 72rpx;
+    height: 72rpx;
+    display: block
+}
+
+.placeholder {
+    color: #aaa9a9;
+}
+
+.nextpoint {
+    padding:16rpx 12rpx;
+    font-size: 30rpx;
+    background-color: #ffffff;
+    border-top: 2rpx solid #ebebeb;
+}
+
+.nextpointimage {
+    height: 30rpx;
+    width: 30rpx
+}
+
+.handlepeople {
+    height: 200rpx;
+    background-color: #ffffff;
+    border-top: 2rpx solid #ebebeb;
+    padding:16rpx 12rpx;
+}
+
+.tasknode {
+    color:#aaa9a9;
+    font-size: 30rpx;
+    width: 30%
+}
+
+.nodecontanier {
+    width: 600rpx;
+    float: left
+}
+
+.nodeitem {
+    width: 146rpx;
+    padding: 8rpx 0rpx 16rpx 0rpx;
+    float: left
+}
+
+.morebutton {
+    height: 56rpx;
+    font-size: 28rpx;
+    line-height: 2
+}
+
+/*表单CSS*/
+.formrow {
+    min-height: 70rpx;
+    font-size: 30rpx;
+    border-bottom: 2rpx solid #f3f3f3;
+    padding-left: 32rpx;
+    line-height: 2.3
+}
+
+.formrowtitle {
+    width: 180rpx;
+    color: #aaa9a9;
+    float: left;
+    
+}
+
+.formrowname {
+    float: left;
+}
+
+.toolbarcontanier {
+    position: absolute;
+    bottom: 0rpx;
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row-reverse;
+}
+
+.toolbarbtn {
+    color: #3993db;
+    font-size: 32rpx;
+    height: 96rpx;
+    line-height: 3;
+    border: 2rpx solid #d4d4d4;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.moretoolbar {
+    width: 200rpx !important;
+    position: absolute;
+    border: 2rpx solid rgba(128, 128, 128, 0.2);
+    border-radius: 8rpx;
+    bottom: 120rpx;
+    z-index: 999;
+    left: 24rpx;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column-reverse;
+}
+
+.moretoolbarbtn {
+    border-width: 0px !important;
+    width: 100% !important;
+    height: 96rpx !important;
+    color: rgb(57, 147, 219);
+    background: transparent;
+    font-size: 32rpx;
+    line-height: 3;
+    text-align: center;
+    flex-grow: 1;
+}

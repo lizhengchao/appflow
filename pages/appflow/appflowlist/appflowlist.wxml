@@ -1,0 +1,82 @@
+<view class="container">
+    <view class="appflowtype">
+        <view wx:for="{{tabselectordata}}">
+            <view class="typeview">
+                <button class="typebutton" bindtap="tabtap" id="{{index}}">{{item.text}}</button>
+            </view>
+        </view>
+    </view>
+    <view class="appflowlist">
+        <scroll-view scroll-y="true" bindscrolltolower="listtolower" class="appflowlistsroll">
+            <view wx:for="{{appflows.appflowlist}}" wx:key="rownumber">
+                <!--代办任务-->
+                <block wx:if="{{curentseltype==0}}">
+                    <view class="appflowitem" bindtap="itemtap" id="{{index}}">
+                        <view class="itemleft0"><text class="itemtext0">
+                            <block wx:if="{{item.taskdesc != null}}">{{item.taskdesc}}</block>
+                            <block wx:else></block>    
+                        </text></view>
+                        <view class="itemright0"><text class="itemtext">
+                            <block wx:if="{{item.actdt != null}}">{{item.actdt}}</block>
+                            <block wx:else></block>   
+                        </text></view>
+                        <view class="itemline"></view>
+                        <view class="itemleft">
+                            <image src="../../../resource/image/newicon/u156.png" class="itemicon"></image>
+                            <text class="itemtext">{{item.bizname == null? '':item.bizname}}</text>
+                        </view>
+                        <view class="itemcenter">
+                            <image src="../../../resource/image/work/send.png" class="itemicon2"></image>
+                            <text class="itemtext2">
+                                <block wx:if="{{item.initiator_name != null}}">{{item.initiator_name}}</block>
+                                <block wx:else></block> 
+                        </text>
+                        </view>
+                        <view class="itemright">
+                            <image src="../../../resource/image/work/u43.png" class="itemicon3"></image>
+                            <text class="itemtext3">
+                                <block wx:if="{{item.sduetime != null}}">{{item.sduetime}}</block>
+                                <block wx:else></block>
+                            </text>
+                        </view>
+                    </view>
+                </block>
+                <!--已办任务、我发起的流程-->
+                <block wx:if="{{curentseltype==2 || curentseltype==1}}">
+                    <view class="appflowitem" bindtap="itemtap" id="{{index}}">
+                        <view class="itemleft0"><text class="itemtext0">
+                            <block wx:if="{{item.keyword != null}}">{{item.keyword}}</block>
+                            <block wx:else></block>    
+                        </text></view>
+                        <view class="itemright0"><text class="itemtext">
+                            <block wx:if="{{item.actdt != null}}">{{item.actdt}}</block>
+                            <block wx:else></block>   
+                        </text></view>
+                        <view class="itemline"></view>
+                        <view class="itemleft">
+                            <image src="../../../resource/image/newicon/u156.png" class="itemicon"></image>
+                            <text class="itemtext">{{item.bizname == null? '':item.bizname}}</text>
+                        </view>
+                        <view class="itemcenter">
+                            <image src="../../../resource/image/work/send.png" class="itemicon2"></image>
+                            <text class="itemtext2">
+                                <block wx:if="{{item.curusername != null}}">{{item.curusername}}</block>
+                                <block wx:else></block> 
+                        </text>
+                        </view>
+                        <view class="itemright">
+                            <image src="../../../resource/image/work/run.png" class="itemicon3"></image>
+                            <text class="itemtext3">
+                                <block wx:if="{{item.pista != null}}">{{item.pista}}</block>
+                                <block wx:else></block>
+                            </text>
+                        </view>
+                    </view>
+                </block>
+            </view>
+            <block wx:if="{{appflows.pageindex*appflows.pagesize<=appflows.rowcount}}">
+                <view class="moretap"><text>向上滑动加载更多</text></view>
+            </block>
+        </scroll-view>
+    </view>
+</view>

@@ -1,0 +1,100 @@
+.appflowtype {
+    height: 10%;
+}
+
+.typeview {
+    width: 250rpx;
+    float: left;
+}
+
+.typebutton {
+    font-size: 27rpx;
+}
+
+.appflowlist {
+    height: 90%;
+    position: absolute;
+    top: 64rpx
+}
+
+.appflowlistsroll {
+    height: 100%
+}
+
+.appflowitem {
+    height: 100rpx;
+    padding: 26rpx 22rpx 26rpx 22rpx;
+}
+
+.itemleft0 {
+    float: left;
+    width: 466rpx;
+}
+
+.itemright0 {
+    float: left;
+    width: 233rpx;
+    text-align: right;
+}
+
+.itemline {
+    float: left; 
+    width: 100%
+}
+
+.itemleft {
+    float: left;
+    width: 233rpx;
+}
+
+.itemcenter {
+    float: left;
+    width: 233rpx;
+    text-align: center
+}
+
+.itemright {
+    float: left;
+    width: 233rpx;
+    text-align: right
+}
+
+.itemicon {
+    height: 32rpx;
+    width: 32rpx
+}
+
+.itemtext0 {
+    font-size: 30rpx
+}
+
+.itemtext {
+    color: #aaa9a9;
+    font-size: 26rpx
+}
+
+.itemicon2 {
+    height: 32rpx;
+    width: 52rpx
+}
+
+.itemtext2 {
+    color: #3993db;
+    font-size: 26rpx
+}
+
+.itemicon3 {
+    height: 32rpx;
+    width: 32rpx
+}
+
+.itemtext3 {
+    color: #000000;
+    font-size: 26rpx
+}
+
+.moretap {
+    text-align: center;
+    font-size: 32rpx;
+    clear: both
+}
