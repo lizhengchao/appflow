@@ -56,6 +56,7 @@ Page({
         taskinstid: '',
         pageType: '',  //页面类型，Edit:代办任务；View: 已办、我发起的任务；View_OAWF:flowtype为oawf的代办任务，在onLoad中初始化
         needPeople: false, //是否需要指派办理人
+        currentnodeid, //当前选择的nodeidid,用于指派办理人时的展示
 
         ////////////////////////////输入的交互数据/////////////////////////////////////////
         comments: '', //审批意见
@@ -182,12 +183,19 @@ Page({
         
         //如果当前节点需要选择下级办理人，则展示下级办理人页面
         if(currentnode.designate_actor && currentnode.checkbox == 2){
+            me.data.currentnodeid = currentnode.nodeid;
+            for(var nextNodeDesignateActor in taskInfo.nextNodeDesignateActor){
+                if(nextNodeDesignateActor.nodeId == currentnode.nodeid){
+                    nextNodeDesignateActor.checkbox = 0;
+                }
+            }
             me.data.nodedisplay.nodecontanier = 'block';
         } else if (currentnode.designate_actor && currentnode.checkbox == 0){
             me.data.nodedisplay.nodecontanier = 'none';
         }
         this.setData({
-            nodedisplay: me.data.nodedisplay
+            nodedisplay: me.data.nodedisplay,
+            currentnodeid: me.data.currentnodeid 
         })
 
         //加入到交互数据
@@ -372,6 +380,7 @@ Page({
                             nodedisplay: me.data.nodedisplay
                         })
                         if(signNode == 0){ //无需选择下级节点，同时显示下级节点办理人
+                            me.data.currentnodeid = nextNodes[i].nodeid;
                             me.data.nodedisplay.nodecontanier = 'block';
                             var nextNodeDesignateActor = me.data.taskInfo.nextNodeDesignateActor;
                             //为下级节点办理人初始化图标属性
@@ -380,7 +389,8 @@ Page({
                             }
                             this.setData({
                                 nodedisplay: me.data.nodedisplay,
-                                taskInfo: me.data.taskInfo
+                                taskInfo: me.data.taskInfo,
+                                currentnodeid: me.data.currentnodeid
                             })
                         }
                     }
