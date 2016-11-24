@@ -277,6 +277,32 @@ Page({
         }
     },
 
+    //“驳回”按钮
+    rejectbtnTap: function(){
+        var me =this,
+            signid = me.data.signid,
+            comments = me.data.comments,
+            issigature = me.data.taskInfo.taskInstInfo[0].issigature,
+            logid = getApp().GLOBAL_CONFIG.userId;
+        
+        if(comments.length<=0){
+            wx.showToast({ title: "审批意见不能为空", icon: 'success' }); return;
+        }
+        if (issigature == 1 && !signid) {
+            wx.showToast({ title: "需要签章，请选择签章", icon: 'success' }); return;
+        }
+
+        var params = {
+                method: 'GetRollBackInfo',
+                flowType: me.data.flowType,
+                piid: me.data.piid,
+                nodeid: me.data.nodeid,
+                taskinstid: me.data.taskinstid,
+                logid: getApp().GLOBAL_CONFIG.userId
+            };
+
+    },
+
     //“提交”按钮
     submitbtnTap: function(){
         var me = this,
@@ -291,40 +317,20 @@ Page({
             dealArray = [];//请求时办理人参数
         
         if(comments.length<=0){
-            wx.showToast({
-                title: "审批意见不能为空",
-                icon: 'success'
-            });
-            return;
+            wx.showToast({ title: "审批意见不能为空", icon: 'success' }); return;
         }
-
         if (issigature == 1 && !signid) {
-            wx.showToast({
-                title: "需要签章，请选择签章",
-                icon: 'success'
-            });
-            return;
+            wx.showToast({ title: "需要签章，请选择签章", icon: 'success' }); return;
         }
-
-        if (designate_node == 1) {
-            if (nodeArray.length == 0) {
-                wx.showToast({
-                title: "需要指定下级节点",
-                icon: 'success'
-            });
-            return;
-            }
+        if (designate_node == 1 && nodeArray.length == 0) {
+            wx.showToast({ title: "需要指定下级节点", icon: 'success' }); return;
         }
 
         if (me.data.needPeople) { //需要指定下级节点办理人
             for(var i=0; i<nodeArray.length; i++){
                 var node = nodeArray[i];
                 if (nodePerson[node.nodeid].length == 0) {
-                    wx.showToast({
-                        title: "未指定办理人",
-                        icon: 'success'
-                    });
-                    return;
+                    wx.showToast({ title: "未指定办理人", icon: 'success' }); return;
                 } else {
                     for(var i=0; i<nodePerson[node.nodeid]; i++){
                         var person = nodePerson[node.nodeid][i];
@@ -334,10 +340,7 @@ Page({
             };
         }
 
-        wx.showToast({
-            title: "正在提交",
-            icon: 'success'
-        });
+        wx.showToast({title: "正在提交", icon: 'success' });
 
         var params = {
                 method: 'Approve',
@@ -354,34 +357,11 @@ Page({
                 nexnodes: util.arrayToString(nodeArray),
                 nextnodeactors: util.arrayToString(dealArray)
             };
-        wx.request({
-          url: getApp().GLOBAL_CONFIG.productAdr + getApp().GLOBAL_CONFIG.requestAdr.getTaskDetail,
-          data: util.parseParam(params),
-          method: 'POST', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-          header: {Cookie: wx.getStorageSync('Cookie'),
-                    'Content-Type': 'application/x-www-form-urlencoded'}, // 设置请求的 header
-          success: function(res){
-              if(res.data.status == 'succeed'){
-                  wx.showToast({
-                      title: '提交成功',
-                      icon: 'success'
-                  })
-                wx.navigateBack();
-              } else {
-                  wx.showToast({
-                      title: res.data.errmsg,
-                      icon: 'success'
-                  })
-              }
-          },
-          fail: function() {
-            // fail
-          },
-          complete: function() {
-            // complete
-          }
-        })
 
+        me.AFRequst('TaskInstance', params, function(data){
+            wx.showToast({ title: '提交成功', icon: 'success' });
+            wx.navigateBack();
+        })
     },
 
     ////////////////////////////自建方法/////////////////////////////////////////
@@ -389,43 +369,28 @@ Page({
     getAppflowDetail: function(obj, successcallback){
         var me = this,
             loginid = '00022',
-            productAdr = getApp().GLOBAL_CONFIG.productAdr,
-            getTask = getApp().GLOBAL_CONFIG.requestAdr.getTaskDetail,
             params,
             cookie = wx.getStorageSync('Cookie');
         
         if(obj.curentseltype == 0){
-            params = 'method=GetTaskInstanceInfo'+'&logid='+loginid+'&flowtype='+
-                obj.flowtype+'&piid='+obj.piid+'&nodeid='+obj.nodeid+'&taskinstid='+obj.taskinstid;
+            params = {
+                method: 'GetTaskInstanceInfo',
+                logid: loginid,
+                flowtype: obj.flowtype,
+                piid: obj.piid,
+                nodeid: obj.nodeid,
+                taskinstid: obj.taskinstid
+            }
         } else {
-            params = 'method=GetFlowAllInfo'+'&logid='+loginid+'&flowtype='+
-                obj.flowtype+'&piid='+obj.piid;
+            params = {
+                method: 'GetFlowAllInfo',
+                logid: loginid,
+                flowtype: obj.flowtype,
+                piid: obj.piid
+            }
         }
 
-        wx.request({
-          url: productAdr + getTask,
-          data: params,
-          method: 'POST', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-          header: {
-              'Cookie': cookie,
-              'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, // 设置请求的 header
-          success: function(res){
-            if(res.data.status != 'succeed'){
-                wx.showToast({
-                    title: res.data.errmsg,
-                    icon: 'success'
-                });
-                return;
-            }
-            successcallback(res.data);
-          },
-          fail: function() {
-            // fail
-          },
-          complete: function() {
-            // complete
-          }
-        })
+        me.AFRequst('TaskInstance', params, successcallback)
     },
 
     //初始化任务页面数据
@@ -515,5 +480,28 @@ Page({
             me.setData({
                 toolbars: me.data.toolbars
             });
-    }
+    },
+
+    AFRequst: function (funcname, params, callback) {
+        var me = this;
+        wx.request({
+          url: getApp().GLOBAL_CONFIG.productAdr + "/rest/api/workflow/" + funcname + "/Get",
+          data: util.parseParam(params),
+          method: 'POST', 
+          header: {
+            'Cookie': wx.getStorageSync('Cookie'),
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+          },
+          success: function(res){
+            if(res.data.status){
+                callback(res.data);
+            } else {
+                wx.showToast({title:'服务器接口异常', icon: 'success'});
+            }
+          },
+          fail: function(res) {
+            wx.showToast({title:'连接服务器失败', icon: 'success'});
+          }
+        })
+    },
 })
