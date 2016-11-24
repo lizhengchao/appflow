@@ -30,6 +30,7 @@ App({
       'kernel': '/rest/api/kernelsession',
        'getTaskList': '/rest/api/workflow/TaskInstanceList/Get',
        'getTaskDetail': '/rest/api/workflow/TaskInstance/Get'
-    }
+    },
+    'userId': '00022'
   }
 })

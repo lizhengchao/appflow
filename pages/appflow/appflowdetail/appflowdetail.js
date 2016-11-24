@@ -1,3 +1,4 @@
+var util = require("../../../utils/util");
 Page({
     data: {
         ////////////////////////////页面绑定数据/////////////////////////////////////////
@@ -56,13 +57,13 @@ Page({
         taskinstid: '',
         pageType: '',  //页面类型，Edit:代办任务；View: 已办、我发起的任务；View_OAWF:flowtype为oawf的代办任务，在onLoad中初始化
         needPeople: false, //是否需要指派办理人
-        currentnodeid, //当前选择的nodeidid,用于指派办理人时的展示
+        currentnodeid: 0, //当前选择的nodeidid,用于指派办理人时的展示
 
         ////////////////////////////输入的交互数据/////////////////////////////////////////
         comments: '', //审批意见
         signid: '', //签章id，暂时未做签章
-        currentnodes: [], //当前已选择的下级节点
-        currentnodeactors: [] //当前已选择的下级节点办理人,多个节点，每个节点对应对个办理人
+        nodeArray: [], //当前已选择的下级节点
+        nodePerson: [] //当前已选择的下级节点办理人,多个节点，每个节点对应对个办理人
     },
     onLoad: function(obj){
         var me = this;
@@ -71,7 +72,7 @@ Page({
           title: obj.detailtitle
         })
 
-        me.data.flowType = obj.flowType;
+        me.data.flowType = obj.flowtype;
         me.data.piid = obj.piid;
         me.data.nodeid = obj.nodeid;
         me.data.taskinstid = obj.taskinstid;
@@ -159,6 +160,11 @@ Page({
         })
     },
 
+    //审批意见输入
+    commentsChange: function(e){
+        this.data.comments = e.detail.value;
+    },
+
     //下级节点选择按钮
     tasknodetap: function(e){
         var me = this,
@@ -184,27 +190,36 @@ Page({
         //如果当前节点需要选择下级办理人，则展示下级办理人页面
         if(currentnode.designate_actor && currentnode.checkbox == 2){
             me.data.currentnodeid = currentnode.nodeid;
-            for(var nextNodeDesignateActor in taskInfo.nextNodeDesignateActor){
-                if(nextNodeDesignateActor.nodeId == currentnode.nodeid){
-                    nextNodeDesignateActor.checkbox = 0;
+            for(var i in taskInfo.nextNodeDesignateActor){
+                if(taskInfo.nextNodeDesignateActor[i].nodeid == currentnode.nodeid){
+                    taskInfo.nextNodeDesignateActor[i].checkbox = 0;
                 }
             }
+            me.setData({
+                currentnodeid: me.data.currentnodeid,
+                taskInfo: taskInfo
+            })
             me.data.nodedisplay.nodecontanier = 'block';
         } else if (currentnode.designate_actor && currentnode.checkbox == 0){
             me.data.nodedisplay.nodecontanier = 'none';
         }
-        this.setData({
+        me.setData({
             nodedisplay: me.data.nodedisplay,
-            currentnodeid: me.data.currentnodeid 
+            
         })
 
         //加入到交互数据
         if(currentnode.checkbox == 2){
-            me.data.currentnodes.push({
+            me.data.nodeArray.push({
                 nodeid: currentnode.nodeid
             });
         } else {
-            me.data.currentnodes.remove();
+            for(var i in me.data.nodeArray){
+                var node = me.data.nodeArray[i];
+                if(node.nodeid == currentnode.nodeid){
+                    me.data.nodeArray.splice(i, 1);
+                }
+            }
         }
 
     },
@@ -215,10 +230,10 @@ Page({
             taskInfo = me.data.taskInfo,
             id = e.currentTarget.id,
             currentactor = taskInfo.nextNodeDesignateActor[id],
-            currentnodeactors = me.data.currentnodeactors;
+            nodePerson = me.data.nodePerson;
         
         //更改checkbox显示
-        if(!currentactor.checkbox || currentactor.checkbox == 0){
+        if(currentactor.checkbox == 0){
             currentactor.checkbox = 2;
         } else {
             currentactor.checkbox = 0;
@@ -229,8 +244,8 @@ Page({
 
         //加入到交互数据
         if(currentactor.checkbox == 2){
-            if(!currentnodeactors[currentactor.nodeid]){
-                currentnodeactors[currentactor.nodeid] = [];
+            if(!nodePerson[currentactor.nodeid]){
+                nodePerson[currentactor.nodeid] = [];
             }
             var item = {
                 nodeid: currentactor.nodeid,
@@ -238,7 +253,14 @@ Page({
                 usercode: currentactor.usercode,
                 username: currentactor.username
             };
-            currentnodeactors[currentactor.nodeid].push(item);
+            nodePerson[currentactor.nodeid].push(item);
+        } else { //从交互数据中移除
+            for(var i in nodePerson[currentactor.nodeid]){
+                if(nodePerson[currentactor.nodeid][i].nodeid == currentactor.nodeid &&
+                    nodePerson[currentactor.nodeid][i].usercode == currentactor.usercode){
+                    nodePerson[currentactor.nodeid].splice(i, 1);
+                }
+            }
         }
     },
 
@@ -260,8 +282,8 @@ Page({
         var me = this,
             comments = me.data.comments,
             signid = me.data.signid,
-            currentnodes = me.data.currentnodes,
-            currentnodeactors = me.data.currentnodeactors,
+            nodeArray = me.data.nodeArray,
+            nodePerson = me.data.nodePerson,
             
             issigature = me.data.taskInfo.taskInstInfo[0].issigature,
             designate_node = me.data.taskInfo.taskInstInfo[0].designate_node,
@@ -285,7 +307,7 @@ Page({
         }
 
         if (designate_node == 1) {
-            if (currentnodes.length == 0) {
+            if (nodeArray.length == 0) {
                 wx.showToast({
                 title: "需要指定下级节点",
                 icon: 'success'
@@ -295,25 +317,70 @@ Page({
         }
 
         if (me.data.needPeople) { //需要指定下级节点办理人
-            for(var i=0; i<currentnodes.length; i++){
-                var node = currentnodes[i];
-                if (currentnodeactors[node.nodeid].length == 0) {
+            for(var i=0; i<nodeArray.length; i++){
+                var node = nodeArray[i];
+                if (nodePerson[node.nodeid].length == 0) {
                     wx.showToast({
                         title: "未指定办理人",
                         icon: 'success'
                     });
+                    return;
                 } else {
-                    for(var i=0; i<currentnodeactors[node.nodeid]; i++){
-                        var person = currentnodeactors[node.nodeid][i];
+                    for(var i=0; i<nodePerson[node.nodeid]; i++){
+                        var person = nodePerson[node.nodeid][i];
                         dealArray.push({nodeid: person.nodeid, elecode: person.elecode, usercode: person.usercode});
                     };
                 }
-                if (returnFlg) {
-                    return false;
-                }
             };
-            if (returnFlg) return;
         }
+
+        wx.showToast({
+            title: "正在提交",
+            icon: 'success'
+        });
+
+        var params = {
+                method: 'Approve',
+                flowType: me.data.flowType,
+                piid: me.data.piid,
+                nodeid: me.data.nodeid,
+                taskinstid: me.data.taskinstid,
+                logid: getApp().GLOBAL_CONFIG.userId,
+                remark: comments || '语音',
+                signcode: signid,
+                bizdata: util.arrayToString([]),
+                audioremark: '',
+                // nextnodes: designate_node == 1 ? encodeURIComponent(nodeArray) : [],
+                nexnodes: util.arrayToString(nodeArray),
+                nextnodeactors: util.arrayToString(dealArray)
+            };
+        wx.request({
+          url: getApp().GLOBAL_CONFIG.productAdr + getApp().GLOBAL_CONFIG.requestAdr.getTaskDetail,
+          data: util.parseParam(params),
+          method: 'POST', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+          header: {Cookie: wx.getStorageSync('Cookie'),
+                    'Content-Type': 'application/x-www-form-urlencoded'}, // 设置请求的 header
+          success: function(res){
+              if(res.data.status == 'succeed'){
+                  wx.showToast({
+                      title: '提交成功',
+                      icon: 'success'
+                  })
+                wx.navigateBack();
+              } else {
+                  wx.showToast({
+                      title: res.data.errmsg,
+                      icon: 'success'
+                  })
+              }
+          },
+          fail: function() {
+            // fail
+          },
+          complete: function() {
+            // complete
+          }
+        })
 
     },
 

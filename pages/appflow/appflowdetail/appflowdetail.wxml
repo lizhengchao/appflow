@@ -69,7 +69,7 @@
             <view class="intervalrow"></view>
             <view class="advicecontanier">
                 <view class="advicecontanier0">
-                    <textarea class="adivcecontent" placeholder="审批意见" placeholder-class="placeholder">{{comments}}</textarea>
+                    <textarea class="adivcecontent" placeholder="审批意见" placeholder-class="placeholder" bindblur="commentsChange"></textarea>
                     <view>
                         <image src="../../../resource/image/newicon/u167.png" class="tagicon"></image>
                         <image src="../../../resource/image/newicon/u169.png" class="tagicon" style="margin-top: 20rpx"></image>
@@ -108,11 +108,13 @@
                         <view class="tasknode">任务节点</view>
                         <view class="nodecontanier">
                             <block wx:for="{{taskInfo.nextNodeDesignateActor}}">
-                            <view class="nodeitem">
-                                <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
-                                    class="nextpointimage" id="{{index}}" bindtap="handlenodetap"></image>
-                                <text>{{item.username}}</text>
-                            </view>
+                                <block wx:if="{{currentnodeid == item.nodeid}}">  <!-- 只显示当前节点对应的办理人 -->
+                                    <view class="nodeitem">
+                                        <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
+                                            class="nextpointimage" id="{{index}}" bindtap="handlenodetap"></image>
+                                        <text>{{item.username}}</text>
+                                    </view>
+                                </block>
                             </block>
                         </view>
                         <view>
