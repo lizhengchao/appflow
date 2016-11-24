@@ -1,5 +1,5 @@
 .appflowtype {
-    height: 10%;
+    height: 5%;
 }
 
 .typeview {
@@ -13,8 +13,6 @@
 
 .appflowlist {
     height: 90%;
-    position: absolute;
-    top: 64rpx
 }
 
 .appflowlistsroll {

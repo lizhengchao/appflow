@@ -17,8 +17,7 @@ Page({
         rowcount: 0,
         pageindex: 1,
         pagesize: 20
-      },
-      loginnumber: 0 //模拟登录失败时尝试登陆的次数
+      }
     },
 
     //加载审批列表
@@ -30,14 +29,39 @@ Page({
     },
 
     onShow: function(){
-      var a = 1;
-    },
-
-    onPullDownRefresh: function(){
+      var me = this;
+      this.setData({
+        appflows: {
+          appflowlist: [],
+          rowcount: 0,
+          pageindex: 1,
+          pagesize: 20
+        }
+      })
       this.getappflowlist({
         loginid: getApp().GLOBAL_CONFIG.userId,
         pageindex: 1,
-        pagesize: 20 })
+        pagesize: 20,
+        myflowtype:  me.data.curentseltype})
+    },
+
+    onPullDownRefresh: function(){
+      var me = this;
+      this.setData({
+        appflows: {
+          appflowlist: [],
+          rowcount: 0,
+          pageindex: 1,
+          pagesize: 20
+        }
+      })
+      this.getappflowlist({
+        loginid: getApp().GLOBAL_CONFIG.userId,
+        pageindex: 1,
+        pagesize: 20,
+        myflowtype:  me.data.curentseltype}, function(){
+          wx.stopPullDownRefresh();
+        })
     },
 
     //拉到页面最下方
@@ -126,7 +150,7 @@ Page({
           } else {
             //将获取到的cookie塞到localstorge
             //TODO
-            var cookie = 'ASP.NET_SessionId=wu2qzau2pdsabg3yu3ioj3nj';
+            var cookie = 'ASP.NET_SessionId=vzve5555xnmwgd25rvhvhe45';
             wx.setStorageSync('Cookie', cookie);
             successcallback({
               loginid: loginid,
@@ -142,7 +166,7 @@ Page({
     },
 
     //获取审批列表 need: loginid: 用户id； pageindex:当前页 
-    getappflowlist: function(option){
+    getappflowlist: function(option, successcallback){
       var loginid = option.loginid,
         pageindex = option.pageindex,
         pagesize = option.pagesize,
@@ -175,13 +199,7 @@ Page({
         method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         header: {'Cookie': cookie},
         success: function(res){
-          if(res.data.status == "UnLogin"){
-            //未登陆则尝试模拟登陆三次
-            if(me.data.loginnumber<3){
-              me.kernelsession(loginid, 1, me.getappflowlist(option));
-              me.data.loginnumber ++;
-            }
-          } else if(res.data.status == "succeed"){
+          if(res.data.status == "succeed"){
             me.data.appflows.appflowlist = me.data.appflows.appflowlist.concat(res.data.data);
             me.data.appflows.rowcount = res.data.rowcount;
             me.data.appflows.pageindex = pageindex;
@@ -189,6 +207,7 @@ Page({
             me.setData({
                 appflows: me.data.appflows
             })
+            if(typeof successcallback == 'function') successcallback(res);
           } else {
             wx.showToast({
                 title: res.data.errmsg,
