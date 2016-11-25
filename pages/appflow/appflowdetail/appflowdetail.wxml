@@ -104,23 +104,25 @@
                     <image src="../../../resource/image/newicon/{{taskdisplay[3].iconname}}" class="rowicon" bindtap="tasktap" id='3tap'></image>
                 </view>
                 <view class="handlepeople" style="display: {{taskdisplay[3].display}}">
-                    <view style="display: {{nodedisplay.nodecontanier}}">
-                        <view class="tasknode">任务节点</view>
-                        <view class="nodecontanier">
-                            <block wx:for="{{taskInfo.nextNodeDesignateActor}}">
-                                <block wx:if="{{currentnodeid == item.nodeid}}">  <!-- 只显示当前节点对应的办理人 -->
-                                    <view class="nodeitem">
-                                        <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
-                                            class="nextpointimage" id="{{index}}" bindtap="handlenodetap"></image>
-                                        <text>{{item.username}}</text>
-                                    </view>
+                    <block wx:for="{{currentnodeids}}"  wx:for-item="currentnodeid">
+                        <view style="display: {{nodedisplay.nodecontanier}}">
+                            <view class="tasknode">任务节点</view>
+                            <view class="nodecontanier">
+                                <block wx:for="{{taskInfo.nextNodeDesignateActor}}">
+                                    <block wx:if="{{currentnodeid == item.nodeid}}">  <!-- 只显示当前节点对应的办理人 -->
+                                        <view class="nodeitem">
+                                            <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
+                                                class="nextpointimage" id="{{index}}" bindtap="handlenodetap"></image>
+                                            <text>{{item.username}}</text>
+                                        </view>
+                                    </block>
                                 </block>
-                            </block>
+                            </view>
+                            <view>
+                                <button class="morebutton">更多</button>
+                            </view>
                         </view>
-                        <view>
-                            <button class="morebutton">更多</button>
-                        </view>
-                    </view>
+                    </block>
                 </view>
             </view>
 

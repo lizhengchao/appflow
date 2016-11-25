@@ -57,7 +57,7 @@ Page({
         taskinstid: '',
         pageType: '',  //页面类型，Edit:代办任务；View: 已办、我发起的任务；View_OAWF:flowtype为oawf的代办任务，在onLoad中初始化
         needPeople: false, //是否需要指派办理人
-        currentnodeid: 0, //当前选择的nodeidid,用于指派办理人时的展示
+        currentnodeids: [], //当前选择的nodeidid,用于指派办理人时的展示
 
         ////////////////////////////输入的交互数据/////////////////////////////////////////
         comments: '', //审批意见
@@ -189,18 +189,22 @@ Page({
         
         //如果当前节点需要选择下级办理人，则展示下级办理人页面
         if(currentnode.designate_actor && currentnode.checkbox == 2){
-            me.data.currentnodeid = currentnode.nodeid;
+            me.data.currentnodeids.push(currentnode.nodeid);
             for(var i in taskInfo.nextNodeDesignateActor){
                 if(taskInfo.nextNodeDesignateActor[i].nodeid == currentnode.nodeid){
                     taskInfo.nextNodeDesignateActor[i].checkbox = 0;
                 }
             }
             me.setData({
-                currentnodeid: me.data.currentnodeid,
+                currentnodeids: me.data.currentnodeids,
                 taskInfo: taskInfo
             })
             me.data.nodedisplay.nodecontanier = 'block';
         } else if (currentnode.designate_actor && currentnode.checkbox == 0){
+            for(var i in me.data.currentnodeids){
+                if(me.data.currentnodeids[i] == currentnode.nodeid) 
+                    me.data.currentnodeids.splice(i, 1);
+            }
             me.data.nodedisplay.nodecontanier = 'none';
         }
         me.setData({
@@ -300,6 +304,26 @@ Page({
                 taskinstid: me.data.taskinstid,
                 logid: getApp().GLOBAL_CONFIG.userId
             };
+
+        me.AFRequst('TaskInstance', params, function (resp) {
+            if (resp.status == 'succeed') {
+                if (resp.rollBackNodes.length == 0) {
+                    wx.showToast({ title: '该流程已过审批节点，不支持驳回操作', icon: 'success' });
+                }
+                else {
+                    getApp().taskInfo = me.data.taskInfo; //对象没法通过url传递，只能通过全局
+                    getApp().rollBackInfo = resp;
+                    wx.navigateTo({
+                      url: 'rejectpanel/rejectpanel?rollBackInfo='+resp+"&remark="+
+                        (comments || '语音')+"&signcode="+signid+"&flowType="+me.data.flowType+
+                        "&piid="+me.data.piid+"&nodeid="+me.data.nodeid+"&taskinstid="+me.data.taskinstid
+                    })
+                }
+            }
+            else {
+                wx.showToast({ title: '无法驳回：' + resp.errmsg, icon: 'success' });
+            }
+        });
 
     },
 
@@ -412,7 +436,7 @@ Page({
                             nodedisplay: me.data.nodedisplay
                         })
                         if(signNode == 0){ //无需选择下级节点，同时显示下级节点办理人
-                            me.data.currentnodeid = nextNodes[i].nodeid;
+                            me.data.currentnodeids.push(nextNodes[i].nodeid);
                             me.data.nodedisplay.nodecontanier = 'block';
                             var nextNodeDesignateActor = me.data.taskInfo.nextNodeDesignateActor;
                             //为下级节点办理人初始化图标属性
@@ -420,9 +444,9 @@ Page({
                                 nextNodeDesignateActor[i].checkbox = 0;
                             }
                             this.setData({
+                                currentnodeids: me.data.currentnodeids,
                                 nodedisplay: me.data.nodedisplay,
-                                taskInfo: me.data.taskInfo,
-                                currentnodeid: me.data.currentnodeid
+                                taskInfo: me.data.taskInfo
                             })
                         }
                     }
@@ -482,6 +506,7 @@ Page({
             });
     },
 
+    //审批流请求
     AFRequst: function (funcname, params, callback) {
         var me = this;
         wx.request({
@@ -503,5 +528,5 @@ Page({
             wx.showToast({title:'连接服务器失败', icon: 'success'});
           }
         })
-    },
+    }
 })
