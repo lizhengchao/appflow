@@ -356,8 +356,8 @@ Page({
                 if (nodePerson[node.nodeid].length == 0) {
                     wx.showToast({ title: "未指定办理人", icon: 'success' }); return;
                 } else {
-                    for(var i=0; i<nodePerson[node.nodeid]; i++){
-                        var person = nodePerson[node.nodeid][i];
+                    for(var j=0; j<nodePerson[node.nodeid]; j++){
+                        var person = nodePerson[node.nodeid][j];
                         dealArray.push({nodeid: person.nodeid, elecode: person.elecode, usercode: person.usercode});
                     };
                 }
@@ -378,8 +378,8 @@ Page({
                 bizdata: util.arrayToString([]),
                 audioremark: '',
                 // nextnodes: designate_node == 1 ? encodeURIComponent(nodeArray) : [],
-                nexnodes: util.arrayToString(nodeArray),
-                nextnodeactors: util.arrayToString(dealArray)
+                nexnodes: nodeArray,
+                nextnodeactors: dealArray
             };
 
         me.AFRequst('TaskInstance', params, function(data){
