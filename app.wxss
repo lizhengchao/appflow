@@ -9,6 +9,7 @@ page {
   display: flex;
   flex-flow: column;
   box-sizing: border-box;
+  font-size: 30rpx
 } 
 
 .clear {

@@ -32,5 +32,6 @@ App({
        'getTaskDetail': '/rest/api/workflow/TaskInstance/Get'
     },
     'userId': '00022'
-  }
+  },
+  taskInfo: {}  //当前选择审批任务对象
 })

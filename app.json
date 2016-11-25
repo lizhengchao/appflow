@@ -2,7 +2,7 @@
   "pages":[
     "pages/appflow/appflowlist/appflowlist",
     "pages/appflow/appflowdetail/appflowdetail",
-    "pages/logs/logs"
+    "pages/appflow/appflowdetail/rejectpanel/rejectpanel"
   ],
   "window":{
     "backgroundTextStyle":"light",
@@ -17,6 +17,10 @@
       "text": "审批任务",
       "iconPath": "",
       "selectedIconPath": ""
+    },
+    {
+      "pagePath": "pages/appflow/appflowdetail/rejectpanel/rejectpanel",
+      "text": "驳回测试"
     }]
   }
 }
