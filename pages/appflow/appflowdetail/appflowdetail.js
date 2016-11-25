@@ -1,4 +1,5 @@
 var util = require("../../../utils/util");
+var NG = require("../../../extra/NG")
 Page({
     data: {
         ////////////////////////////页面绑定数据/////////////////////////////////////////
@@ -173,6 +174,7 @@ Page({
         me.setData({
             comments: me.data.comments
         })
+
     },
 
     //下级节点选择按钮
@@ -300,10 +302,10 @@ Page({
             logid = getApp().GLOBAL_CONFIG.userId;
         
         if(comments.length<=0){
-            wx.showToast({ title: "审批意见不能为空", icon: 'success' }); return;
+            NG.showToast({ title: "审批意见不能为空", icon: 'success' }); return;
         }
         if (issigature == 1 && !signid) {
-            wx.showToast({ title: "需要签章，请选择签章", icon: 'success' }); return;
+            NG.showToast({ title: "需要签章，请选择签章", icon: 'success' }); return;
         }
 
         var params = {
@@ -318,7 +320,7 @@ Page({
         me.AFRequst('TaskInstance', params, function (resp) {
             if (resp.status == 'succeed') {
                 if (resp.rollBackNodes.length == 0) {
-                    wx.showToast({ title: '该流程已过审批节点，不支持驳回操作', icon: 'success' });
+                    NG.showToast({ title: '该流程已过审批节点，不支持驳回操作', icon: 'success' });
                 }
                 else {
                     getApp().taskInfo = me.data.taskInfo; //对象没法通过url传递，只能通过全局
@@ -331,7 +333,7 @@ Page({
                 }
             }
             else {
-                wx.showToast({ title: '无法驳回：' + resp.errmsg, icon: 'success' });
+                NG.showToast({ title: '无法驳回：' + resp.errmsg, icon: 'success' });
             }
         });
 
@@ -351,20 +353,20 @@ Page({
             dealArray = [];//请求时办理人参数
         
         if(comments.length<=0){
-            wx.showToast({ title: "审批意见不能为空", icon: 'success' }); return;
+            NG.showToast({ title: "审批意见不能为空", icon: 'success' }); return;
         }
         if (issigature == 1 && !signid) {
-            wx.showToast({ title: "需要签章，请选择签章", icon: 'success' }); return;
+            NG.showToast({ title: "需要签章，请选择签章", icon: 'success' }); return;
         }
         if (designate_node == 1 && nodeArray.length == 0) {
-            wx.showToast({ title: "需要指定下级节点", icon: 'success' }); return;
+            NG.showToast({ title: "需要指定下级节点", icon: 'success' }); return;
         }
 
         if (me.data.needPeople) { //需要指定下级节点办理人
             for(var i=0; i<nodeArray.length; i++){
                 var node = nodeArray[i];
                 if (nodePerson[node.nodeid].length == 0) {
-                    wx.showToast({ title: "未指定办理人", icon: 'success' }); return;
+                    NG.showToast({ title: "未指定办理人", icon: 'success' }); return;
                 } else {
                     for(var j=0; j<nodePerson[node.nodeid]; j++){
                         var person = nodePerson[node.nodeid][j];
@@ -374,7 +376,7 @@ Page({
             };
         }
 
-        wx.showToast({title: "正在提交", icon: 'success' });
+        NG.showToast({title: "正在提交", icon: 'success' });
 
         var params = {
                 method: 'Approve',
@@ -393,8 +395,16 @@ Page({
             };
 
         me.AFRequst('TaskInstance', params, function(data){
-            wx.showToast({ title: '提交成功', icon: 'success' });
+            NG.showToast({ title: '提交成功', icon: 'success' });
             wx.navigateBack();
+        })
+    },
+
+    //“终止”按钮
+    stopbtnTap: function(){
+        NG.showToast({
+            title:'确定终止该流程',
+            icon: 'success'
         })
     },
 
@@ -531,11 +541,11 @@ Page({
             if(res.data.status){
                 callback(res.data);
             } else {
-                wx.showToast({title:'服务器接口异常', icon: 'success'});
+                NG.showToast({title:'服务器接口异常', icon: 'success'});
             }
           },
           fail: function(res) {
-            wx.showToast({title:'连接服务器失败', icon: 'success'});
+            NG.showToast({title:'连接服务器失败', icon: 'success'});
           }
         })
     }

@@ -1,4 +1,5 @@
 var util = require("../../../utils/util")
+var NG = require("../../../extra/NG")
 Page({
     data:{
       tabselectordata: [{
@@ -142,7 +143,7 @@ Page({
         method: 'GET',
         success: function(res){
           if(res.data.status != 'Success'){
-            wx.showToast({
+            NG.showToast({
                 title: res.data.errmsg,
                 icon: 'success'
             });
@@ -150,7 +151,7 @@ Page({
           } else {
             //将获取到的cookie塞到localstorge
             //TODO
-            var cookie = 'ASP.NET_SessionId=vzve5555xnmwgd25rvhvhe45';
+            var cookie = 'ASP.NET_SessionId=zvgoii45lizkqh45sult3245';
             wx.setStorageSync('Cookie', cookie);
             successcallback({
               loginid: loginid,
@@ -209,7 +210,7 @@ Page({
             })
             if(typeof successcallback == 'function') successcallback(res);
           } else {
-            wx.showToast({
+            NG.showToast({
                 title: res.data.errmsg,
                 icon: 'success'
             });

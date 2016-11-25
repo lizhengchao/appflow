@@ -1,4 +1,5 @@
 var util = require("../../../../utils/util");
+var NG = require("../../../../extra/NG");
 Page({
     data: {
         ////////////////////////////页面绑定数据/////////////////////////////////////////
@@ -129,7 +130,7 @@ Page({
             dealArray = [],
             rollbacknode;
         if (!currentNode) {
-            wx.showToast({ title: "未指定驳回节点", icon: 'success' }); return;
+            NG.showToast({ title: "未指定驳回节点", icon: 'success' }); return;
         } else {
             rollbacknode = currentNode.nodeid;
         }
@@ -137,7 +138,7 @@ Page({
             //判断办理人是否为空
             if (currentNode.designate_actor == "1") {
                 if (nodePerson.length == 0) {
-                    wx.showToast({ title: "未指定办理人", icon: 'success' }); return;
+                    NG.showToast({ title: "未指定办理人", icon: 'success' }); return;
                 } else {
                     for(var i in nodePerson){
                         dealArray.push({
@@ -150,7 +151,7 @@ Page({
             }
         }
 
-        wx.showToast({ title: "正在驳回", icon: 'success' });
+        NG.showToast({ title: "正在驳回", icon: 'success' });
 
         var params = {
                 method: 'RollBack',
@@ -169,7 +170,7 @@ Page({
         
         me.AFRequst("TaskInstance", params, function(data){
             if(data.status=="succeed") wx.navigateBack({ delta: 2 });
-            else wx.showToast({ title: data.errmsg, icon: 'success' });;
+            else NG.showToast({ title: data.errmsg, icon: 'success' });;
         })
     },
 
@@ -224,11 +225,11 @@ Page({
             if(res.data.status){
                 callback(res.data);
             } else {
-                wx.showToast({title:'服务器接口异常', icon: 'success'});
+                NG.showToast({title:'服务器接口异常', icon: 'success'});
             }
           },
           fail: function(res) {
-            wx.showToast({title:'连接服务器失败', icon: 'success'});
+            NG.showToast({title:'连接服务器失败', icon: 'success'});
           }
         })
     }
