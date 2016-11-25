@@ -23,20 +23,20 @@ Page({
         ],
         taskdisplay: [ //几个可展开的模块是否显示
             {
-                display: 'block',
-                iconname: 'u156.png'
+                display: 'none',
+                iconname: 2
             },
             {
-                display: 'block',
-                iconname: 'u156.png'
+                display: 'none',
+                iconname: 2
             },
             {
-                display: 'block',
-                iconname: 'u156.png'
+                display: 'none',
+                iconname: 2
             },
             {
-                display: 'block',
-                iconname: 'u156.png'
+                display: 'none',
+                iconname: 2
             }
         ],
         nodedisplay: {  
@@ -147,13 +147,13 @@ Page({
         var id = e.currentTarget.id.substring(0,1),
             taskdetaildisplay = this.data.taskdisplay[id];
         if(taskdetaildisplay.display == 'block' 
-            && taskdetaildisplay.iconname == 'u156.png'){
+            && taskdetaildisplay.iconname == 1){
                 taskdetaildisplay.display = 'none';
-                taskdetaildisplay.iconname = 'u4.png';
+                taskdetaildisplay.iconname = 2;
         } else if(taskdetaildisplay.display == 'none' 
-            && taskdetaildisplay.iconname == 'u4.png'){
+            && taskdetaildisplay.iconname == 2){
                 taskdetaildisplay.display = 'block';
-                taskdetaildisplay.iconname = 'u156.png';
+                taskdetaildisplay.iconname = 1;
         }
         this.setData({
             taskdisplay: this.data.taskdisplay
@@ -163,6 +163,16 @@ Page({
     //审批意见输入
     commentsChange: function(e){
         this.data.comments = e.detail.value;
+    },
+
+    advicebtntap: function(e){
+        var me = this,
+            id = e.currentTarget.id,
+            text = me.data.taskInfo.commonWord[id].text;
+        me.data.comments += text;
+        me.setData({
+            comments: me.data.comments
+        })
     },
 
     //下级节点选择按钮
