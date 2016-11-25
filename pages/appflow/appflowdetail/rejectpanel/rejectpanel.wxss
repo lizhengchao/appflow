@@ -1,0 +1,66 @@
+.rejectcontainer {
+    background-color: #ebebeb
+}
+.fallbacktitle {
+    background-color: #fff;
+    border: 2rpx solid #efefef;
+    border-bottom: 0rpx;
+    height: 64rpx;
+    line-height: 2;
+    padding: 0rpx 0rpx 0rpx 24rpx
+}
+
+.completebtn {
+    float:right;
+    height: 64rpx;
+    font-size: 32rpx;
+    line-height: 2
+}
+
+.nextpoint {
+    padding:16rpx 12rpx;
+    font-size: 30rpx;
+    background-color: #ffffff;
+    border-top: 2rpx solid #efefef;
+}
+
+.nextpointimage {
+    height: 30rpx;
+    width: 30rpx;
+    margin-right: 10rpx
+}
+
+.intervalrow {
+    height: 20rpx;
+    background-color: #ebebeb;
+}
+
+.handlepeople {
+    height: 200rpx;
+    background-color: #ffffff;
+    border-top: 2rpx solid #ebebeb;
+    padding:16rpx 12rpx;
+}
+
+.tasknode {
+    color:#aaa9a9;
+    font-size: 30rpx;
+    width: 30%
+}
+
+.nodecontanier {
+    width: 600rpx;
+    float: left
+}
+
+.nodeitem {
+    width: 146rpx;
+    padding: 8rpx 0rpx 16rpx 0rpx;
+    float: left
+}
+
+.morebutton {
+    height: 56rpx;
+    font-size: 28rpx;
+    line-height: 2
+}

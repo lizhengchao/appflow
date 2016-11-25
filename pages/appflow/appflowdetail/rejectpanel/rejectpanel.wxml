@@ -1,0 +1,33 @@
+<!--驳回视图-->
+<view class="container rejectcontainer">
+    <view class="fallbacktitle">
+        <text>回退节点</text>
+        <button class="completebtn" bindtap="rollbackComplate">完成</button>
+    </view>
+    <block wx:for="{{rollBackInfo.rollBackNodes}}">
+        <view class="nextpoint">
+            <image src="../../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
+                class="nextpointimage" id="{{index}}" bindtap="tasknodetap"></image>
+            <text>{{item.nodetext}}</text>
+        </view>
+    </block>
+    <view class="intervalrow"></view>
+    <view class="fallbacktitle">
+        <text>指派回退节点办理人</text>
+    </view>
+    <view class="handlepeople" style="display: {{handlepeopledisplay}}">
+        <view class="tasknode">任务节点</view>
+        <view class="nodecontanier">
+            <block wx:for="{{rollBackInfo.nextNodeDesignateActor}}">
+                <view class="nodeitem">
+                    <image src="../../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
+                        class="nextpointimage" id="{{index}}" bindtap="handlenodetap"></image>
+                    <text>{{item.username}}</text>
+                </view>
+            </block>
+        </view>
+        <view>
+            <button class="morebutton">更多</button>
+        </view>
+    </view>
+</view>
