@@ -182,24 +182,82 @@
 
 /*表单CSS*/
 .formrow {
+    background-color: #fff;
     min-height: 70rpx;
     font-size: 30rpx;
     border-bottom: 2rpx solid #f3f3f3;
     padding-left: 32rpx;
-    line-height: 2.3
+    line-height: 2.33
 }
 
 .formrowtitle {
     width: 180rpx;
     color: #aaa9a9;
     float: left;
-    
 }
 
 .formrowname {
     float: left;
 }
 
+.screenshotimg1 {
+    height: 80rpx;
+    width: 80rpx;
+}
+
+.screenshotimg2 {
+    height: 40rpx;
+    width: 40rpx;
+    margin-top:30rpx;
+    margin-right: 30rpx;
+    float: right
+}
+
+.detailrowtitle {
+    margin-left: 30rpx;
+    width: 180rpx;
+    color: #aaa9a9;
+    float: left;
+}
+
+.detailtapimage {
+    width: 40rpx;
+    height: 40rpx;
+    float: right;
+    margin-right: 30rpx;
+    margin-top: 10rpx
+}
+
+/*附件CSS*/
+.attachmentcontainer {
+    height: 80rpx;
+    background-color: #fff;
+    padding: 22rpx 26rpx;
+    line-height: 2
+}
+
+.attachimg {
+    height: 80rpx;
+    width: 80rpx;
+    float: left;
+}
+
+.attachdes {
+    float: left
+}
+
+.attachtitle {
+    display: block;
+    font-size: 30rpx;
+    height: 40rpx;
+}
+
+.attachattribute {
+    color: #AAA9A9;
+    font-size:26rpx;
+}
+
+/*工作栏CSS*/
 .toolbarcontanier {
     position: absolute;
     bottom: 0rpx;

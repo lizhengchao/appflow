@@ -1,0 +1,120 @@
+<view class="taskrow">
+            <text>任务详情</text>
+            <image src="../../../resource/image/newicon/{{taskdisplay[0].iconname == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='0tap'></image>
+        </view>
+        <view class="taskdetailcontanier" style="display:{{taskdisplay[0].display}}">
+            <block wx:if="{{pageType == 'Edit' || pageType == 'View_OAWF'}}">
+                <view class="taskdetailrow">
+                    <view class="taskdetailrowname">任务描述</view>
+                    <view class="taskdetailrowvalue">{{taskInfo.taskInstInfo[0].taskdesc}}</view>
+                </view>
+                <view class="taskdetailrow">
+                    <view class="taskdetailrowname">任务开始时间</view>
+                    <view class="taskdetailrowvalue">{{taskInfo.taskInstInfo[0].startdt}}</view>
+                </view>
+                <view class="taskdetailrow">
+                    <view class="taskdetailrowname">流程开始时间</view>
+                    <view class="taskdetailrowvalue">{{taskInfo.taskInstInfo[0].pistartdt}}</view>
+                </view>
+                <view class="taskdetailrow">
+                    <view class="taskdetailrowname">发起人</view>
+                    <view class="taskdetailrowvalue">{{taskInfo.taskInstInfo[0].initiator}}</view>
+                </view>
+            </block>
+            <block wx:elif="pageType == 'View'">
+                <view class="taskdetailrow">
+                    <view class="taskdetailrowname">任务描述</view>
+                    <view class="taskdetailrowvalue">{{taskInfo.flowInfo[0].keyword}}</view>
+                </view>
+                <view class="taskdetailrow">
+                    <view class="taskdetailrowname">任务开始时间</view>
+                    <view class="taskdetailrowvalue">{{taskInfo.flowInfo[0].startdt}}</view>
+                </view>
+                <view class="taskdetailrow">
+                    <view class="taskdetailrowname">流程结束时间</view>
+                    <view class="taskdetailrowvalue">{{taskInfo.flowInfo[0].enddt}}</view>
+                </view>
+                <view class="taskdetailrow">
+                    <view class="taskdetailrowname">发起人</view>
+                    <view class="taskdetailrowvalue">{{taskInfo.flowInfo[0].initiator}}</view>
+                </view>
+            </block>
+        </view>
+        <view class="intervalrow"></view>
+        <view class="taskrow">
+            <text>流转历史</text>
+            <image src="../../../resource/image/newicon/{{taskdisplay[1].iconname == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='1tap'></image>
+        </view>
+        <view class="historycontanier" style="display: {{taskdisplay[1].display}}">
+            <block wx:for='{{taskInfo.flowHistory}}'>
+                <view class="historyrow">
+                <view class="histortext3">{{item.remark}}</view>
+                <view class="historytext">{{item.actualactor}}</view>
+                <view class="historytext">{{item.action}}</view>
+                <view class="historytext2">{{item.actdt}}</view>
+            </view>
+            </block>
+        </view>
+        <!--如果是已办或我发起的任务则一下模块不显示-->
+        <view style="display: {{pageType == 'Edit' ? 'block' : 'none'}}"> 
+            <view class="intervalrow"></view>
+            <view class="advicecontanier">
+                <view class="advicecontanier0">
+                    <textarea class="adivcecontent" placeholder="审批意见" placeholder-class="placeholder" bindblur="commentsChange" value="{{comments}}"></textarea>
+                    <view>
+                        <image src="../../../resource/image/newicon/u167.png" class="tagicon"></image>
+                        <image src="../../../resource/image/newicon/u169.png" class="tagicon" style="margin-top: 20rpx"></image>
+                    </view>
+                </view>
+                <view class="advicecontanier1">
+                    <block wx:for="{{taskInfo.commonWord}}">
+                    <button class="advicebutton" id="{{index}}" bindtap="advicebtntap">{{item.text}}</button>
+                    </block>
+                </view>
+            </view>
+
+            <view style="display: {{nodedisplay.nextnode}}">
+                <view class="intervalrow"></view>
+                <view class="taskrow">
+                    <text>下一个节点</text>
+                    <image src="../../../resource/image/newicon/{{taskdisplay[2].iconname == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='2tap'></image>
+                </view>
+                <block wx:for="{{taskInfo.nextNodes}}">
+                    <view class="nextpoint" style="display: {{taskdisplay[2].display}}">
+                        <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
+                            class="nextpointimage" id="{{index}}" bindtap="tasknodetap"></image>
+                        <text>{{item.nodetext}}</text>
+                    </view>
+                </block>
+            </view>
+
+            <view style="display: {{nodedisplay.handlepeople}}">
+                <view class="intervalrow"></view>
+                <view class="taskrow">
+                    <text>指派下级节点办理人</text>
+                    <image src="../../../resource/image/newicon/{{taskdisplay[3].iconname == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='3tap'></image>
+                </view>
+                <view class="handlepeople" style="display: {{taskdisplay[3].display}}">
+                    <block wx:for="{{currentnodeids}}"  wx:for-item="currentnodeid">
+                        <view style="display: {{nodedisplay.nodecontanier}}">
+                            <view class="tasknode">任务节点</view>
+                            <view class="nodecontanier">
+                                <block wx:for="{{taskInfo.nextNodeDesignateActor}}">
+                                    <block wx:if="{{currentnodeid == item.nodeid}}">  <!-- 只显示当前节点对应的办理人 -->
+                                        <view class="nodeitem">
+                                            <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
+                                                class="nextpointimage" id="{{index}}" bindtap="handlenodetap"></image>
+                                            <text>{{item.username}}</text>
+                                        </view>
+                                    </block>
+                                </block>
+                            </view>
+                            <view>
+                                <button class="morebutton">更多</button>
+                            </view>
+                        </view>
+                    </block>
+                </view>
+            </view>
+
+        </view>

@@ -3,26 +3,13 @@ var NG = require("../../../extra/NG")
 Page({
     data: {
         ////////////////////////////页面绑定数据/////////////////////////////////////////
-        tabselectordata: [{
-            color: '#f39800',
-            bindtap: 'tasktap',
-            text: '任务'
-        },{
-            color: '#000000',
-            bindtap: 'formtap',
-            text: '表单'
-        },{
-            color: '#000000',
-            bindtap: 'attachmenttap',
-            text: '附件'
-        }
-        ],
+        tabselectordata: [],
         contanierdisplay: [ //三个tab页是否显示
             'block',
             'none',
             'none'
         ],
-        taskdisplay: [ //几个可展开的模块是否显示
+        taskdisplay: [ //几个可展开的模块是否显示，默认不显示
             {
                 display: 'none',
                 iconname: 2
@@ -51,16 +38,20 @@ Page({
         toolbars: [],
         moretoolbardisplay: 'none',
 
+        formAttachment: [], //表单页附件绑定数据
+        formData: [], //表单页绑定数据
+        formDetailData: [], //表单页详细信息绑定数据
+
         ////////////////////////////逻辑数据/////////////////////////////////////////
-        flowType: '',
-        piid: '',
-        nodeid: '',
-        taskinstid: '',
+        flowType: '', piid: '', nodeid: '', taskinstid: '', bizType: '',
         pageType: '',  //页面类型，Edit:代办任务；View: 已办、我发起的任务；View_OAWF:flowtype为oawf的代办任务，在onLoad中初始化
         needPeople: false, //是否需要指派办理人
         currentnodeids: [], //当前选择的nodeidid,用于指派办理人时的展示
 
-        ////////////////////////////输入的交互数据/////////////////////////////////////////
+        hasFieldEdit: false,   ExpMap: {}, calcExpDirs: [], bizDataHasChanged: false,//表单逻辑参数
+
+
+       ////////////////////////////输入的交互数据/////////////////////////////////////////
         comments: '', //审批意见
         signid: '', //签章id，暂时未做签章
         nodeArray: [], //当前已选择的下级节点
@@ -76,7 +67,8 @@ Page({
         me.data.flowType = obj.flowtype;
         me.data.piid = obj.piid;
         me.data.nodeid = obj.nodeid;
-        me.data.taskinstid = obj.taskinstid;
+        me.data.taskinstid = obj.taskinstid,
+        me.data.bizType = obj.bizType;
         
         if(obj.curentseltype == 0){
             me.data.pageType = 'Edit';
@@ -97,7 +89,9 @@ Page({
                 pageType: me.data.pageType
             });
 
+            me.initTopTab();
             me.initTaskPanel();
+            me.initFormPanel();
             me.initToolbar();
             
         });
@@ -116,33 +110,8 @@ Page({
 
     },
     ////////////////////////////页面事件/////////////////////////////////////////
-    //tab页选择点击事件
-    tabseltap: function(e){
-        var id = e.currentTarget.id,
-            me = this,
-            tabselectordata = me.data.tabselectordata,
-            contanierdisplay = me.data.contanierdisplay;
-        //更改按钮颜色
-        tabselectordata[id].color='#f39800';
-        for(var i=0; i<tabselectordata.length; i++){
-            if(i != id){
-                tabselectordata[i].color='#000000';
-            }
-        }
-        //更改页面块
-        contanierdisplay[id] = 'block';
-        for(var i=0; i<contanierdisplay.length; i++){
-            if(i != id){
-                contanierdisplay[i] = 'none';
-            }
-        }
-        this.setData({
-            tabselectordata: this.data.tabselectordata,
-            contanierdisplay: this.data.contanierdisplay
-        })
-    },
-    listtolower: function(e){
-    },
+
+    ///////////////任务页面事件//////////
     //下拉按钮点击
     tasktap: function(e){
         var id = e.currentTarget.id.substring(0,1),
@@ -166,6 +135,7 @@ Page({
         this.data.comments = e.detail.value;
     },
 
+    //意见按钮点击
     advicebtntap: function(e){
         var me = this,
             id = e.currentTarget.id,
@@ -278,6 +248,54 @@ Page({
                 }
             }
         }
+    },
+
+
+    /////////////表单页面事件//////////
+    //表单详细列表点击事件
+    detailtap: function(e){
+        var me = this,
+            ids = e.currentTarget.id,
+            id0 = ids.split(",")[0],
+            id1 = ids.split(",")[1],
+            currentData = me.data.formDetailData[id0].items[id1];
+        
+        if(!currentData.display || currentData.display==0){
+            currentData.display = 1;
+        } else {
+            currentData.display = 0;
+        }
+        me.setData({
+            formDetailData: me.data.formDetailData
+        })
+
+    },
+
+    ////////////通用事件//////////////
+    //tab页选择点击事件
+    tabseltap: function(e){
+        var id = e.currentTarget.id,
+            me = this,
+            tabselectordata = me.data.tabselectordata,
+            contanierdisplay = me.data.contanierdisplay;
+        //更改按钮颜色
+        tabselectordata[id].color='#f39800';
+        for(var i=0; i<tabselectordata.length; i++){
+            if(i != id){
+                tabselectordata[i].color='#000000';
+            }
+        }
+        //更改页面块
+        contanierdisplay[id] = 'block';
+        for(var i=0; i<contanierdisplay.length; i++){
+            if(i != id){
+                contanierdisplay[i] = 'none';
+            }
+        }
+        this.setData({
+            tabselectordata: this.data.tabselectordata,
+            contanierdisplay: this.data.contanierdisplay
+        })
     },
 
     //“更多”按钮
@@ -402,11 +420,39 @@ Page({
 
     //“终止”按钮
     stopbtnTap: function(){
-        NG.showToast({
-            title:'确定终止该流程',
-            icon: 'success'
+        var me = this;
+        wx.showModal({
+            title: '提示',
+            content: '确定终止该流程',
+            success: function(res){
+                if(res.confirm){
+                NG.showToast({title: '正在终止', icon: 'success'});
+
+                var parms = {
+                    method: 'Terminate',
+                    logid: getApp().GLOBAL_CONFIG.userId,
+                    flowType: me.data.flowType,
+                    piid: me.data.piid,
+                    nodeid: me.data.nodeid,
+                    taskinstid: me.data.taskinstid,
+                    remark: me.data.comments,
+                    bizdata: '[]',
+                    audioremark: ''
+                };
+
+                me.AFRequst('TaskInstance', parms, function (resp) {
+                    if (resp.status == 'succeed') {
+                        wx.navigateBack({ delta: 1 });
+                    }
+                    else {
+                        NG.showToast({title: '终止失败：' + resp.errmsg, icon: 'success'});
+                    }
+                });
+                }
+            }
         })
     },
+
 
     ////////////////////////////自建方法/////////////////////////////////////////
     //获取列表详情
@@ -435,6 +481,37 @@ Page({
         }
 
         me.AFRequst('TaskInstance', params, successcallback)
+    },
+
+    //初始化上方选择按钮
+    initTopTab: function(){
+        var me = this,
+            taskInfo = me.data.taskInfo,
+            bizAttachment = taskInfo.bizAttachment;
+        if(bizAttachment.length == 0){
+            me.setData({
+                tabselectordata: [{
+                    color: '#f39800',
+                    text: '任务'
+                },{
+                    color: '#000000',
+                    text: '表单'
+                }]
+            })
+        } else {
+            me.setData({
+                tabselectordata: [{
+                    color: '#f39800',
+                    text: '任务'
+                },{
+                    color: '#000000',
+                    text: '表单'
+                },{
+                    color: '#000000',
+                    text: '附件'
+                }]
+            })
+        }
     },
 
     //初始化任务页面数据
@@ -485,6 +562,364 @@ Page({
                 })
             }
         }
+    },
+
+    //初始化表单页面数据
+    initFormPanel: function(){
+        var me = this,
+            flowType = me.data.flowType,
+            bizType = me.data.bizType,
+            bizData,
+            attachDatas = [],
+            bizAttachment = me.data.taskInfo.bizAttachment;
+
+            for(var i in bizAttachment){
+                if(bizAttachment[i].isbizcontent == '1') me.data.formAttachment.push(bizAttachment[i]);
+            }
+            me.setData({formAttachment: me.data.formAttachment})
+            {
+                    //TODO: 附件选择事件
+                    // container.element.down('div[name=contentattach]').addListener('touchend', function (view) {
+                    //     //NG.openFile(wordInfo.data);
+                    //     var parms = {
+                    //         arctable: data.arctable,
+                    //         arccode: data.arccode,
+                    //         attachname: data.attachname
+                    //     };
+                    //     if (view.target.downloadurl) {
+                    //         NG.downLoadFile(view.target.downloadurl, data.arctable + "_" + data.arccode, data.attachname, data.attachsize);
+                    //         return;
+                    //     }
+                    //     NG.setWaiting(true, "正在获取附件地址");
+                    //     Ext.Ajax.request({
+                    //         url: NG.getProductLoginInfo().productAdr + "/rest/api/oa/ArchiveAttach/Get",
+                    //         method: 'POST',
+                    //         params: parms,
+                    //         success: function (response, opts) {
+                    //             var resp = Ext.JSON.decode(response.responseText);
+                    //             NG.setWaiting(false);
+                    //             if (resp.downloadurl) {
+                    //                 view.target.downloadurl = resp.downloadurl;
+                    //                 var logInfo = NG.getProductLoginInfo();
+                    //                 NG.dbManager.deleteData("attach_temp", "eno=? and logid=? and asrcode=? and asrtable=? and attachname=?", [logInfo.eNo, logInfo.loginId, data.arccode, data.arctable, data.attachname], function () {
+                    //                 	NG.dbManager.insert("attach_temp", [
+	                //                         {
+	                //                             eno: logInfo.eNo,
+	                //                             logid: logInfo.loginId,
+	                //                             updatetime: new Date().getTime(),
+	                //                             attachname: data.attachname,
+	                //                             asratttable: data.asrattachtable,
+	                //                             asrtable: data.arctable,
+	                //                             asrcode: data.arccode,
+	                //                             downloadurl: resp.downloadurl
+	                //                         }
+	                //                     ]);
+                    // 				});
+                    //                 me.downloadurls.push({
+                    //                     downloadurl: resp.downloadurl,
+                    //                     asratttable: data.asrattachtable,
+                    //                     asrtable: data.arctable,
+                    //                     asrcode: data.arccode,
+                    //                     attachname: data.attachname
+                    //                 });
+                    //                 NG.downLoadFile(resp.downloadurl, data.arctable + "_" + data.arccode, data.attachname, data.attachsize);
+                    //             }
+                    //             else {
+                    //                 NG.alert("无法获取附件地址", 1500);
+                    //             }
+                    //         },
+                    //         failure: function (response, opts) {
+                    //             NG.setWaiting(false);
+                    //             NG.alert(GLOBAL_CONFIG.NetWorkError, 1500);
+                    //         }
+                    //     });
+                    // });
+            }
+
+        var bizData = me.data.taskInfo.bizData;
+        if (bizData && bizType != "RW_ReportApply" && bizType != "AQ_CHK_M" && bizType != "AQ_CHK_M2") { //报表审批,现场检查单独处理
+            if (me.pageType == "Edit") {
+                me.getExpMapFromBizData(bizData);
+            }
+            var mainItems = [], detailItems = [],
+                mainBiz = bizData[0], detailBiz,
+                d_Idx = 0, len = bizData.length;
+            if (mainBiz && mainBiz.Type === 0) { // 有主表信息
+                d_Idx = 1;
+                for(var i in mainBiz.FieldSetings){
+                    var item = mainBiz.FieldSetings[i];
+                    if (item.ColtrolValue != 2) { //隐藏不需要显示
+                        var defaultValue = mainBiz.DataRows.length > 0 ? 
+                            mainBiz.DataRows[0].FieldValueList[i] : {FieldCode: item.FieldCode, Value: "", DisplayValue: "", OriginalValue: ""};
+                        mainItems.push(me.getEditField(item, defaultValue, mainBiz.GroupCode + "-" + item.FieldCode + "-0", mainBiz.Type, mainBiz.GroupCode));
+                    }
+                };
+            }
+            if (flowType == "oawf") {
+                me.getWordInfo(function (wordInfo) {
+                    me.data.formAttachment.push({attachname: wordInfo.name})
+                    //TODO: 附件点击事件
+                    // container.element.down('div[name=myformurl]').addListener('touchend', function () {
+                    //     NG.openFile(wordInfo.data);
+                    // });
+                });
+            } else {
+                mainItems.push({
+                    label: '单据截图',
+                    isScreenshot: true
+                    // TODO: 单据截图事件
+                    // listeners: {
+                    //     initialize: function () {
+                    //         this.element.on({
+                    //             delegate: '.img',
+                    //             tap: function (label, target) {
+                    //                 if (!target.isLoadedImg) {
+                    //                     me.openImage(target);
+                    //                 } else if (target.imgSrc) {
+                    //                     NG.showImage(target, target.imgSrc);
+                    //                 }
+                    //             }
+                    //         });
+                    //     }
+                    // }
+                });
+            }
+            
+            me.setData({ formData: mainItems});
+
+            //生成明细表单据信息
+            for (var i = d_Idx; i < len; i++) {
+                var fields = [];
+                detailBiz = bizData[i];
+                detailItems.push({
+                    xtype: 'ngaccordion',
+                    name: detailBiz.GroupCode,
+                    displayname: detailBiz.GroupName,
+                    cls: 'simple',
+                    defaults: {
+                        style: 'background-color: #FFFFFF;'
+                    },
+                    items: me.getDetailTable(detailBiz)
+                });
+            }
+            me.setData({
+                formDetailData: detailItems
+            })
+
+        } else {
+            if (!bizData) { //兼容历史版本
+                me.getVoiceBtn().setHidden(true);
+            }
+            me.getDetailMainView().on({
+                activeitemchange: "OnActiveItemChange",
+                scope: me
+            });
+        }
+        
+
+    },
+
+       /* 获取明细表 */
+    getDetailTable: function(detailBiz) {
+        var me = this,
+            items = [];
+        for(var rowIndex in detailBiz.DataRows){
+            var row = detailBiz.DataRows[rowIndex];
+            var container = {
+                    title: row.RowDesc,
+                    xtype: 'container',
+                    name: detailBiz.GroupCode + "-" + row.RowNum,
+                    spacing: 0,
+                    padding: '6 0 6 10',
+                    hidden: true,
+                    cls: 'noAfter',
+                    defaults: {
+                        labelWidth: 80,
+                        cls: 'edit-input',
+                        clearIcon: false,
+                        labelWrap: true
+                    }
+                },
+            fields = [];
+            for(var index in detailBiz.FieldSetings){
+                    var item = detailBiz.FieldSetings[index];
+                if (item.ColtrolValue != 2) { //隐藏不需要显示
+                    fields.push(me.getEditField(item, row.FieldValueList[index], detailBiz.GroupCode + "-" + item.FieldCode + "-" + row.RowNum, detailBiz.Type, detailBiz.GroupCode));
+                }
+            };
+            container.items = fields;
+            items.push(container);
+        };
+        return items;
+    },
+
+    //获取表达式字段之间的映射关系
+    getExpMapFromBizData: function(bizData) {
+        var me = this,
+            matchArray, match, field, item;
+        me.ExpMap = {};
+
+        for (var i = 0, len1 = bizData.length; i < len1; i++) {
+            item = bizData[i];
+            for (var j = 0, len2 = item.FieldSetings.length; j < len2; j++) {
+                field = item.FieldSetings[j];
+                if (field.ComputeExpr) {
+                    var name = item.GroupCode + "-" + field.FieldCode;
+                    matchArray = field.ComputeExpr.match(/\{([^\{\}]+)\}/g);
+                    for (var k = 0, len = matchArray.length; k < len; k++) {
+                        match = matchArray[k].substring(1, matchArray[k].length - 1).replace(/\./g, '-');
+                        if (!me.ExpMap[match]) {
+                            me.ExpMap[match] = [];
+                        }
+                        if (me.ExpMap[match].indexOf(name) < 0) {
+                            me.ExpMap[match].push(name);
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    /*
+     * 获取field
+     */
+    getEditField: function(item, values, name, tableType, table) {
+        var me = this,
+            hasKeyUp = false,
+            xtypes = { 'string': 'textfield', 'datetime': 'datefieldux', 'date': 'datefieldux', 'int': 'textfield', 'float': 'textfield', 'binary': 'textfield' },
+            field = { 'xtype': 'textfield', 'name': '', 'value': '', 'readOnly': true, 'label': '', 'required': false };
+        field.name = name;
+        field.id = name;
+        field.label = item.FieldDesc;
+        field.value = values.DisplayValue;
+        if (item.FieldType == "binary") { // 二进制数据，设置链接点击查看
+            field.xtype = "ngviewtext";
+            field.value = '<div class="btn-url" style="color: #3993db; text-decoration: underline; width: 100%;line-height: 30px;">查看</div>';
+            if (item.FieldCode == "uploadimage" && Ext.isEmpty(values.DisplayValue)) {
+                field.value = "";
+            }
+            field.fieldCode = item.FieldCode;
+            field.fieldValue = values.DisplayValue;
+            field.listeners = {
+                initialize: function (fd) {
+                    fd.element.on({
+                        tap: function () {
+                            me.downLoadUrl(fd, fd.config.fieldCode, fd.config.fieldValue);
+                        },
+                        delegate: '.btn-url',
+                        scope: me
+                    });
+                }
+            };
+        }
+        if (me.pageType == "Edit") {
+            field.expr = item.ComputeExpr;
+            field.table = table;
+            field.fieldType = item.FieldType;
+            field.tableType = tableType;
+            field.inputCls = "x-input-view";
+            field.dLen = item.DLen || -99;
+            if (item.ColtrolValue != 0 && item.FieldType != "binary") { // 可编辑
+                field.inputCls = "x-input-edit";
+                field.readOnly = false;
+                me.hasFieldEdit = true; //标识当前表单有可编辑字段
+                field.required = item.ColtrolValue == 3;
+                if (item.HelpString) { // 需要调用通用帮助
+                    field.xtype = "ngcommonhelp";
+                    field.readOnly = true;
+                    field.cls = "edit-input edit-select";
+                    field.helper = {title: item.FieldDesc, helpString: item.HelpString};
+                    field.fromValues = values;
+                } else {
+                    field.xtype = xtypes[item.FieldType];
+                }
+                if (field.xtype == "datefieldux") { //时间控件
+                    field.isNull = true;
+                    field.dateFormat = item.FieldType == "datetime" ? 'Y-m-d H:i' : 'Y-m-d';
+                    field.picker = {
+                        xtype: 'timepickerux',
+                        slotOrder: item.FieldType == "datetime" ? ['year', 'month', 'day', 'hour', 'minute'] : ['year', 'month', 'day']
+                    };
+                    if (values.DisplayValue && values.DisplayValue.length > 0) {
+                        field.value = new Date(values.DisplayValue);
+                        field.isNull = false;
+                    }
+                } else if (!field.readOnly && me.ExpMap[name.replace(/-\d+$/, '')]) {
+                    hasKeyUp = true;
+                    field.listeners = {
+                        initialize: function (fd) {
+                            fd.on({
+                                keyup: function (c, e) {
+                                    var evt = e.browserEvent || e.event,
+                                        currV = "",
+                                        target = e.delegatedTarget || e.target,
+                                        match;
+                                    if (evt.keyCode == 37 || evt.keyCode == 39) { //光标左右移动
+                                        return;
+                                    }
+                                    if (target.tagName == "INPUT") {
+                                        if (fd.config.fieldType == "int") {
+                                            currV = target.value.replace(/[^\d]/g, '');
+                                        } else {
+                                            match = target.value.match(/\d+[\.]?(\d+)?/);
+                                            currV = match ? match[0] : '';
+                                        }
+                                        if (target.value != currV) {
+                                            target.value = currV;
+                                        }
+                                        me.calcExpDirs = []; //清空计算路径
+                                   //TODO:     me.onFieldKeyUp(e.delegatedTarget, fd.config.table, fd.config.fieldType);
+                                    }
+                                }
+                            });
+                        }
+                    };
+                }
+                if(!hasKeyUp && me.ExpMap[name.replace(/-\d+$/, '')]) {
+                    field.listeners = {
+                        initialize: function (fd) {
+                            fd.on({
+                                change: function (c, nValue, oValue) {
+                                    var el = c.element.down("input");
+                                    if (el && el.dom) {
+                                        me.calcExpDirs = []; //清空计算路径
+                                 //TODO:       me.onFieldKeyUp(el.dom, fd.config.table, fd.config.fieldType);
+                                    }
+                                }
+                            });
+                        }
+                    };
+                }
+            }
+            if (field.readOnly && field.fieldType == "string" && field.xtype != "ngcommonhelp") {
+                field.xtype = "ngviewtext";
+            }
+        } else {
+            field.xtype = "ngviewtext";
+        }
+        return  field;
+    },
+
+    /*获取收发文正文地址*/
+    getWordInfo: function(callback) {
+        var me = this,
+            logid = getApp().GLOBAL_CONFIG.userId,
+            parms = {
+                method: 'GetTaskBizContent',
+                logid: logid,
+                flowType: me.data.flowtype,
+                piid: me.data.piid
+            };
+        me.AFRequst('TaskInstance', parms, function (resp) {
+            if (resp.status == 'succeed') {
+                if (resp.type.toUpperCase() == 'URL' && resp.data) {
+                    callback && callback(resp);
+                }
+            }
+            else {
+                NG.showToast({title: "获取收发文正文地址出错，piid=" + appFlowInfo.piid, icon: 'success'})
+            }
+        });
     },
 
     //初始化下方操作栏

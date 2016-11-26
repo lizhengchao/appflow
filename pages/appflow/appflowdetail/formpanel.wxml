@@ -1,0 +1,50 @@
+<block wx:for="{{formAttachment}}">
+    <view class="attachmentcontainer" id="{{index}}">
+        <image src="../../../resource/image/word.png" class="attachimg">Content</image>
+        <view class="attachdes">
+            <text class="attachtitle">{{item.attachname}}</text>
+        </view>
+    </view>
+</block>
+
+<block wx:for="{{formData}}">
+    <block wx:if="{{!item.isScreenshot}}">
+        <view class="formrow">
+            <view class="formrowtitle">{{item.label}}</view>
+            <view class="formrowname">{{item.value}}</view>
+            <view class="clear"></view>
+        </view>
+    </block>
+    <block wx:if="{{item.isScreenshot}}">
+        <view class="formrow">
+            <view class="formrowtitle">{{item.label}}</view>
+            <image src='../../../resource/image/form.png' class="screenshotimg1"></image>
+            <image src='../../../resource/image/search_y.png' class="screenshotimg2"></image>
+        </view>
+    </block>
+</block>
+
+<view class="intervalrow"></view>
+
+<block wx:for="{{formDetailData}}" wx:for-index="index0" wx:for-item="item0">
+    <view class="formrow">
+        <view class="formrowtitle" style="width: 100%">{{item0.displayname}}</view>
+    </view>
+    <block wx:for="{{item0.items}}" wx:for-index="index1" wx:for-item="item1">
+        <view class="formrow">
+            <view class="formrowname">{{item1.title}}</view>
+            <image src="../../../resource/image/{{item1.display==1?'down.png':'up.png'}}" 
+                id="{{index0+','+index1}}" class="detailtapimage" bindtap="detailtap"></image>
+        </view>
+        <view style="display: {{item1.display==1?'display':'none'}}">
+            <block wx:for="{{item1.items}}" wx:for-index="index2" wx:for-item="item2">
+                <view class="formrow">
+                    <view class="detailrowtitle">{{item2.label}}</view>
+                    <view class="formrowname">{{item2.value}}</view>
+                    <view class="clear"></view>
+                </view>
+            </block>
+        </view>
+    </block>
+    
+</block>

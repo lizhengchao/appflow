@@ -1,0 +1,9 @@
+<block wx:for="{{taskInfo.bizAttachment}}">
+    <view class="attachmentcontainer" id="{{index}}">
+        <image src="../../../resource/image/word.png" class="attachimg">Content</image>
+        <view class="attachdes">
+            <text class="attachtitle">{{item.attachname}}</text>
+            <text class="attachattribute">{{item.attachtime}}</text>
+        </view>
+    </view>
+</block>

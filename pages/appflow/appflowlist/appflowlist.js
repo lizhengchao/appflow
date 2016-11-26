@@ -116,13 +116,14 @@ Page({
         nodeid = currentappflow.nodeid, //详细页数据的请求参数
         taskinstid = currentappflow.taskinstid, //详细页数据的请求参数
         flowtype = currentappflow.flowtype, //详细页数据的请求参数
+        bizType = currentappflow.bizType, //详细页数据的请求参数
         curentseltype = me.data.curentseltype, //当前选择的任务类型，详细页中需用来做判断
         detailtitle = curentseltype==0 ? 
           currentappflow.taskdesc : currentappflow.keyword; //详细页面标题
 
         wx.navigateTo({
           url: '/pages/appflow/appflowdetail/appflowdetail?piid='+piid+'&nodeid='+
-            nodeid+'&taskinstid='+taskinstid+'&flowtype='+flowtype+
+            nodeid+'&taskinstid='+taskinstid+'&flowtype='+flowtype+'&bizType='+bizType+
             '&curentseltype='+curentseltype+'&detailtitle='+detailtitle
         })
     },
@@ -151,7 +152,7 @@ Page({
           } else {
             //将获取到的cookie塞到localstorge
             //TODO
-            var cookie = 'ASP.NET_SessionId=zvgoii45lizkqh45sult3245';
+            var cookie = 'ASP.NET_SessionId=jkhx2x45o0delc45gljtbpfr';
             wx.setStorageSync('Cookie', cookie);
             successcallback({
               loginid: loginid,
