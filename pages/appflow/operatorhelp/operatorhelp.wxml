@@ -1,0 +1,37 @@
+<view class="container">
+    <block wx:if="{{currentTab == 0}}">
+    <view class="searchcontanier">
+        <view class="searchfield">
+            <image src="../../../resource/image/search.png" class="searchimg">Content</image>
+            <input placeholder="Search" bindinput="searchinput"></input>
+        </view>
+    </view>
+    </block>
+    <scroll-view scroll-y="true" bindscrolltolower="listtolower" class="listcontainer">
+        <block wx:for="{{currentTab == 0 ? operatorlist : (currentTab == 1 ? contactslist : processlist)}}">
+            <view class="itemcontanier">
+                <image src="../../../resource/image/{{item.check == 1 ? 'btn_check_on_normal.png' : 'btn_check_off_normal.png'}}" 
+                    class="itemimg" id="{{index}}" bindtap="itemtap"></image>
+                <view class="itemtextcontanier">
+                    <text>{{item.username + '(' + item.usercode + ')'}}</text>
+                </view>
+                <view class="clear"></view>
+            </view>
+        </block>
+        <block wx:if="{{operatorconfig.pageindex*operatorconfig.pagesize<=operatorconfig.rowcount}}">
+            <view class="moretap"><text>向上滑动加载更多</text></view>
+        </block>
+    </scroll-view>
+    <view class="bottombutton">
+        <block wx:if="{{operatorconfig.hasOperator}}">
+            <view class="bottombuttontext" style="color: {{currentTab == 0 ? '#f9b400' : '#fff'}}" bindtap="operatortap">操作员</view>
+        </block>
+        <block wx:if="{{contactsconfig.hasRecentConatacts}}">
+            <view class="bottombuttontext" style="color:{{currentTab == 1 ? '#f9b400' : '#fff'}}" bindtap="contactstap">最近联系人</view>
+        </block>
+        <block wx:if="{{processconfig.hasProcess}}">
+            <view class="bottombuttontext" style="color: {{currentTab == 2 ? '#f9b400' : '#fff'}}" bindtap="processtap">流程人员</view>
+        </block>
+        <view class="bottombuttontext" style="color: #fff; border: 2rpx solid #fff" bindtap="okbtn">确定</view>
+    </view>
+</view>

@@ -1,0 +1,58 @@
+.searchcontanier {
+    background-color: #ebebeb;
+    padding: 10rpx;
+}
+.searchimg {
+    height: 1.4rem;
+    width: 1.4rem;
+    float: left;
+}
+.searchfield {
+    border: 1px solid #999999;
+    border-radius: 12px !important;
+    color: #000;
+    font-size: 32rpx;
+    background-color: #fff;
+}
+.listcontainer {
+    height: 85%
+}
+.itemcontanier {
+    border-bottom: 2rpx solid #f2f2f2;
+    padding: 22rpx 32rpx 22rpx 32rpx;
+}
+.itemimg {
+    height: 64rpx;
+    width: 64rpx;
+    border: 3rpx solid #b7b6b6;
+    float: left
+}
+.itemtextcontanier {
+    height: 64rpx;
+    font-size: 32rpx; 
+    line-height: 2; 
+    float: left;
+    padding-left: 24rpx;
+}
+.moretap {
+    text-align: center;
+    font-size: 32rpx;
+    clear: both
+}
+.bottombutton {
+    position: absolute;
+    bottom: 0rpx;
+    width: 100%;
+    background-color: #21292c;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+}
+
+.bottombuttontext {
+    font-size: 32rpx;
+    height: 64rpx;
+    line-height: 2;
+    flex-grow: 1;
+    text-align: center;
+}
