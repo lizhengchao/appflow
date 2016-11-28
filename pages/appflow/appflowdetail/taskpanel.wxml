@@ -96,22 +96,20 @@
                 </view>
                 <view class="handlepeople" style="display: {{taskdisplay[3].display}}">
                     <block wx:for="{{currentnodeids}}"  wx:for-item="currentnodeid">
-                        <view style="display: {{nodedisplay.nodecontanier}}">
-                            <view class="tasknode">任务节点</view>
-                            <view class="nodecontanier">
-                                <block wx:for="{{taskInfo.nextNodeDesignateActor}}">
-                                    <block wx:if="{{currentnodeid == item.nodeid}}">  <!-- 只显示当前节点对应的办理人 -->
-                                        <view class="nodeitem">
-                                            <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
-                                                class="nextpointimage" id="{{index}}" bindtap="handlenodetap"></image>
-                                            <text>{{item.username}}</text>
-                                        </view>
-                                    </block>
+                        <view class="tasknode">任务节点</view>
+                        <view class="nodecontanier">
+                            <block wx:for="{{taskInfo.nextNodeDesignateActor}}">
+                                <block wx:if="{{currentnodeid == item.nodeid}}">  <!-- 只显示当前节点对应的办理人 -->
+                                    <view class="nodeitem">
+                                        <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
+                                            class="nextpointimage" id="{{index}}" bindtap="handlenodetap"></image>
+                                        <text>{{item.username}}</text>
+                                    </view>
                                 </block>
-                            </view>
-                            <view>
-                                <button class="morebutton">更多</button>
-                            </view>
+                            </block>
+                        </view>
+                        <view>
+                            <button class="morebutton" bindtap="morebtntap">更多</button>
                         </view>
                     </block>
                 </view>

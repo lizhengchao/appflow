@@ -30,7 +30,6 @@ Page({
         nodedisplay: {  
             nextnode: 'block',  //“下一个节点”是否显示
             handlepeople: 'none', //“指派下级节点办理人”是否显示
-            nodecontanier: 'none' //下级节点办理人是否显示
         },
         taskInfo: {
 
@@ -178,20 +177,16 @@ Page({
                 }
             }
             me.setData({
-                currentnodeids: me.data.currentnodeids,
                 taskInfo: taskInfo
             })
-            me.data.nodedisplay.nodecontanier = 'block';
         } else if (currentnode.designate_actor && currentnode.checkbox == 0){
             for(var i in me.data.currentnodeids){
                 if(me.data.currentnodeids[i] == currentnode.nodeid) 
                     me.data.currentnodeids.splice(i, 1);
             }
-            me.data.nodedisplay.nodecontanier = 'none';
         }
         me.setData({
-            nodedisplay: me.data.nodedisplay,
-            
+            currentnodeids: me.data.currentnodeids,
         })
 
         //加入到交互数据
@@ -248,6 +243,11 @@ Page({
                 }
             }
         }
+    },
+
+    //"更多"按钮
+    morebtntap: function(){
+        
     },
 
 
@@ -534,7 +534,6 @@ Page({
                         })
                         if(signNode == 0){ //无需选择下级节点，同时显示下级节点办理人
                             me.data.currentnodeids.push(nextNodes[i].nodeid);
-                            me.data.nodedisplay.nodecontanier = 'block';
                             var nextNodeDesignateActor = me.data.taskInfo.nextNodeDesignateActor;
                             //为下级节点办理人初始化图标属性
                             for(var i=0; i<nextNodeDesignateActor.length; i++){
