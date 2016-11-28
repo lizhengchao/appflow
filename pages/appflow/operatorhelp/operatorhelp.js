@@ -23,7 +23,6 @@ Page({
             flowType: 'af',
             piid: '0000010676',
             nodeid: '0000000004',
-            hasProcess: true,
             rowcount: 0,
             pageindex: 1,
             pagesize: 20
@@ -37,26 +36,29 @@ Page({
 
     },
     onLoad: function(option){
-         var me = this;
-        //     hasOperator = option.hasOperator,
-        //     hasRecentConatacts = option.hasRecentConatacts,
-        //     hasProcess = option.hasProcess;
+         var me = this,
+            hasOperator = option.hasOperator,
+            hasRecentConatacts = option.hasRecentConatacts,
+            hasProcess = option.hasProcess,
+            currentTab = option.currentTab;
         
-        // me.data.operatorconfig.hasOperator = hasOperator;
-        // me.data.contactsconfig.hasRecentConatacts = hasRecentConatacts;
-        // me.data.processconfig.hasProcess = hasProcess;
+        me.data.operatorconfig.hasOperator = hasOperator === 'true'? true:false;
+        me.data.contactsconfig.hasRecentConatacts = hasRecentConatacts === 'true'? true:false;
+        me.data.processconfig.hasProcess = hasProcess === 'true'? true:false;
         
-        // if(hasProcess){
-        //     me.data.processconfig.flowType = option.flowType;
-        //     me.data.processconfig.piid = option.piid;
-        //     me.data.processconfig.nodeid = option.nodeid;
-        // }
+        if(hasProcess){
+            me.data.processconfig.flowType = option.flowType;
+            me.data.processconfig.piid = option.piid;
+            me.data.processconfig.nodeid = option.nodeid;
+        }
+        
 
-        // me.setData({
-        //     operatorconfig: me.data.operatorconfig,
-        //     contactsconfig: me.data.contactsconfig,
-        //     processconfig: me.data.processconfig
-        // })
+        me.setData({
+            operatorconfig: me.data.operatorconfig,
+            contactsconfig: me.data.contactsconfig,
+            processconfig: me.data.processconfig,
+            currentTab: currentTab
+        })
 
         me.initListData();
     },
@@ -179,7 +181,10 @@ Page({
     okbtn: function(){
         var me = this,
             selectlist = me.data.selectlist;
-        
+        if(selectlist.length == 0){
+            NG.showToast({title:'请选择操作员', icon: 'success'});
+        }
+
         //去除所有重复的项
         for(var i in selectlist){
             for(var j in selectlist){
@@ -269,28 +274,30 @@ Page({
         me.setData({ contactslist: contactslist });
 
         //获取流程人员
-        (function(){
-            var pageindex = me.data.processconfig.pageindex,
-                pagesize = me.data.processconfig.pagesize;
-            me.AFRequst('TaskInstance', {
-                'method': 'GetNodeUsers',
-                'logid': getApp().GLOBAL_CONFIG.userId,
-                'flowType': me.data.processconfig.flowType,
-                'piid': me.data.processconfig.piid,
-                'nodeid': me.data.processconfig.nodeid,
-                'page': me.data.processconfig.pageindex,
-                'start': (pageindex-1) * pagesize,
-                'limit': pagesize,
-                'filter': 'i'
-            }, function(data){
-                me.data.processconfig.rowcount = data.rowcount;
-                processlist = data.data;
-                me.setData({
-                    processconfig: me.data.processconfig,
-                    processlist: processlist
+        if(hasProcess){
+            (function(){
+                var pageindex = me.data.processconfig.pageindex,
+                    pagesize = me.data.processconfig.pagesize;
+                me.AFRequst('TaskInstance', {
+                    'method': 'GetNodeUsers',
+                    'logid': getApp().GLOBAL_CONFIG.userId,
+                    'flowType': me.data.processconfig.flowType,
+                    'piid': me.data.processconfig.piid,
+                    'nodeid': me.data.processconfig.nodeid,
+                    'page': me.data.processconfig.pageindex,
+                    'start': (pageindex-1) * pagesize,
+                    'limit': pagesize,
+                    'filter': 'i'
+                }, function(data){
+                    me.data.processconfig.rowcount = data.rowcount;
+                    processlist = data.data;
+                    me.setData({
+                        processconfig: me.data.processconfig,
+                        processlist: processlist
+                    })
                 })
-            })
-        }());
+            }());
+        }
     }
 
 })

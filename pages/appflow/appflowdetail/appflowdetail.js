@@ -54,7 +54,7 @@ Page({
         comments: '', //审批意见
         signid: '', //签章id，暂时未做签章
         nodeArray: [], //当前已选择的下级节点
-        nodePerson: [] //当前已选择的下级节点办理人,多个节点，每个节点对应对个办理人
+        nodePerson: [] //当前已选择的下级节点办理人,多个节点，每个节点对应对多个办理人
     },
     onLoad: function(obj){
         var me = this;
@@ -245,8 +245,33 @@ Page({
         }
     },
 
-    //"更多"按钮
-    morebtntap: function(){
+    //节点办理人"更多"按钮
+    morebtntap: function(e){
+        var me = this,
+            id = e.currentTarget.id,
+            hasOperator,
+            hasRecentConatacts = false,
+            hasProcess = true,
+            currentTab = 2,
+            flowType = me.data.flowType,
+            piid = me.data.piid,
+            nodeid = id;
+        for(var i in me.data.taskInfo.nextNodes){
+            if(id == me.data.taskInfo.nextNodes[i].nodeid){
+                var designate_anyactor = me.data.taskInfo.nextNodes[i].designate_anyactor;
+                if(designate_anyactor == 0){    //不可选择系统所有人员
+                    hasOperator = false;
+                } else {
+                    hasOperator = true;
+                }
+                break;
+            }
+        }
+
+        wx.navigateTo({
+          url: '/pages/appflow/operatorhelp/operatorhelp?hasOperator='+hasOperator+'&hasRecentConatacts='+hasRecentConatacts+
+            '&hasProcess='+hasProcess+'&flowType='+flowType+'&piid='+piid+'&nodeid='+nodeid+'&currentTab='+currentTab
+        })
         
     },
 

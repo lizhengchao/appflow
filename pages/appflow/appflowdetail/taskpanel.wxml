@@ -109,7 +109,7 @@
                             </block>
                         </view>
                         <view>
-                            <button class="morebutton" bindtap="morebtntap">更多</button>
+                            <button class="morebutton" id="{{currentnodeid}}" bindtap="morebtntap">更多</button>
                         </view>
                     </block>
                 </view>
