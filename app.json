@@ -2,7 +2,8 @@
   "pages":[
     "pages/appflow/appflowlist/appflowlist",
     "pages/appflow/appflowdetail/appflowdetail",
-    "pages/appflow/appflowdetail/rejectpanel/rejectpanel"
+    "pages/appflow/appflowdetail/rejectpanel/rejectpanel",
+    "pages/appflow/operatorhelp/operatorhelp"
   ],
   "window":{
     "backgroundTextStyle":"light",

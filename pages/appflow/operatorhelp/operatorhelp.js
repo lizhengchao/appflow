@@ -30,6 +30,7 @@ Page({
 
 
         ////////////////////////////输入的交互数据/////////////////////////
+        callbackname: '', //回调方法名称
         againstselectself: true,  //能否选择自己
         currentTab: 0, //当前选择的tab页 0:操作员页  1:最近联系人页
         selectlist: [], //已选择的操作员
@@ -42,7 +43,8 @@ Page({
             hasRecentConatacts = option.hasRecentConatacts,
             hasProcess = option.hasProcess,
             currentTab = option.currentTab,
-            againstselectself = option.againstselectself;
+            againstselectself = option.againstselectself,
+            callbackname = option.callbackname;
         
         me.data.againstselectself = againstselectself === 'true'? true:false;
         me.data.operatorconfig.hasOperator = hasOperator === 'true'? true:false;
@@ -57,6 +59,7 @@ Page({
         
 
         me.setData({
+            callbackname: callbackname,
             againstselectself: me.data.againstselectself,
             operatorconfig: me.data.operatorconfig,
             contactsconfig: me.data.contactsconfig,
@@ -186,7 +189,7 @@ Page({
         var me = this,
             selectlist = me.data.selectlist;
         if(selectlist.length == 0){
-            NG.showToast({title:'请选择操作员', icon: 'success'});
+            NG.showToast({title:'请选择操作员', icon: 'success'}); return;
         }
 
         //去除所有重复的项
@@ -198,12 +201,11 @@ Page({
                 }
             }
         }
-
-        getApp().selectlist = selectlist;
-
-        wx.navigateBack({ delta: 1 });
-
-
+        var pages = getCurrentPages(),
+            prevpage = pages[pages.length-2],
+            callbackname = me.data.callbackname;
+        
+        prevpage.callbackname(selectlist);
     },
 
     operatortap: function(){

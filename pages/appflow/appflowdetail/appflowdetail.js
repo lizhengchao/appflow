@@ -100,33 +100,6 @@ Page({
 
     },
     onShow: function(){
-        var me = this,
-            selectlist = getApp().selectlist.slice();
-        
-        //从下级节点办理人页返回
-        if(selectlist.length>0){
-            var currentNode = selectlist[0].nodeid,
-                nodePerson = me.data.nodePerson;
-            nodePerson[currentNode] = [];
-            for(var i in selectlist){
-                nodePerson[currentNode].push(selectlist[i]);
-            }
-            //更改视图绑定数据
-            var nextNodeDesignateActor = me.data.taskInfo.nextNodeDesignateActor;
-            for(var i in nextNodeDesignateActor){
-                for(var j in selectlist){
-                    if(nextNodeDesignateActor[i].nodeid == currentNode){
-                        nextNodeDesignateActor[i].checkbox = 0;
-                        if(nextNodeDesignateActor[i].usercode == selectlist[j].usercode){
-                                nextNodeDesignateActor[i].checkbox = 2;
-                        }
-                    }
-                }
-            }
-            me.setData({taskInfo: me.data.taskInfo});
-            getApp().selectlist = [];
-        }
-        
 
     },
     onHide: function(){
@@ -283,7 +256,8 @@ Page({
             flowType = me.data.flowType,
             piid = me.data.piid,
             nodeid = id,
-            againstselectself = false;
+            againstselectself = false,
+            callbackname = 'morecallback';
         for(var i in me.data.taskInfo.nextNodes){
             if(id == me.data.taskInfo.nextNodes[i].nodeid){
                 var designate_anyactor = me.data.taskInfo.nextNodes[i].designate_anyactor;
@@ -295,10 +269,40 @@ Page({
                 break;
             }
         }
+        me.callbackname = function(selectlist){
+            var me = this,
+            selectlist = selectlist.slice();
+        
+            //从下级节点办理人页返回
+            if(selectlist.length>0){
+                var currentNode = selectlist[0].nodeid,
+                    nodePerson = me.data.nodePerson;
+                nodePerson[currentNode] = [];
+                for(var i in selectlist){
+                    nodePerson[currentNode].push(selectlist[i]);
+                }
+                //更改视图绑定数据
+                var nextNodeDesignateActor = me.data.taskInfo.nextNodeDesignateActor;
+                for(var i in nextNodeDesignateActor){
+                    for(var j in selectlist){
+                        if(nextNodeDesignateActor[i].nodeid == currentNode){
+                            nextNodeDesignateActor[i].checkbox = 0;
+                            if(nextNodeDesignateActor[i].usercode == selectlist[j].usercode){
+                                    nextNodeDesignateActor[i].checkbox = 2;
+                            }
+                        }
+                    }
+                }
+                me.setData({taskInfo: me.data.taskInfo});
+                wx.navigateBack({ delta: 1 })
+                getApp().selectlist = [];
+            }
+        }
 
         wx.navigateTo({
           url: '/pages/appflow/operatorhelp/operatorhelp?hasOperator='+hasOperator+'&hasRecentConatacts='+hasRecentConatacts+
-            '&hasProcess='+hasProcess+'&flowType='+flowType+'&piid='+piid+'&nodeid='+nodeid+'&currentTab='+currentTab+"&againstselectself="+againstselectself
+            '&hasProcess='+hasProcess+'&flowType='+flowType+'&piid='+piid+'&nodeid='+nodeid+'&currentTab='+currentTab+
+            "&againstselectself="+againstselectself+'&callbackname='+callbackname
         })
         
     },
@@ -506,6 +510,128 @@ Page({
         })
     },
 
+    //“加签”按钮
+    addbtnTap: function(){
+        var me = this,
+            signid = me.data.signid,
+            issigature = me.data.taskInfo.taskInstInfo[0].issigature,
+            comments = me.data.comments,
+            flowtype = me.data.flowType,
+            piid = me.data.piid,
+            nodeid = me.data.nodeid,
+            taskinstid = me.data.taskinstid,
+            hasOperator = true,
+            hasRecentConatacts = false,
+            hasProcess = false,
+            currentTab = 0,
+            againstselectself = false,
+            callbackname = 'addcallback';
+        
+        if (issigature == 1 && !signid) {
+            NG.showToast({ title: "需要签章，请选择签章", icon: 'success' }); return;
+        }
+
+        me.callbackname = function(selectlist){
+            var pArr = [];
+            for(var i in selectlist){
+                pArr.push(selectlist[i].usercode);
+            }
+            me.AFRequst('TaskInstance', {
+                method: 'addtis',
+                logid: getApp().GLOBAL_CONFIG.userId,
+                flowType: flowtype,
+                piid: piid,
+                nodeid: nodeid,
+                taskinstid: taskinstid,
+                users: pArr.join(','),
+                remark: comments,
+                signcode: signid,
+                //bizdata: '[]',
+                audioremark: ''
+            }, function (resp) {
+                if (resp.status == 'succeed') {
+                    NG.showToast({ title: "加签成功", icon: 'success' });
+                    wx.navigateBack({ delta: 2 });
+                }
+                else {
+                    NG.showToast({ title: '加签失败：' + resp.errmsg, icon: 'success' }); return;
+                }
+            });
+        }
+
+        wx.navigateTo({
+          url: '/pages/appflow/operatorhelp/operatorhelp?hasOperator='+hasOperator+'&hasRecentConatacts='+hasRecentConatacts+
+            '&hasProcess='+hasProcess+'&currentTab='+currentTab+"&againstselectself="+againstselectself+
+            '&callbackname='+callbackname
+        })
+        
+    },
+
+    //“转签”按钮
+    changebtnTap: function(){
+        var me = this,
+            signid = me.data.signid,
+            issigature = me.data.taskInfo.taskInstInfo[0].issigature,
+            comments = me.data.comments,
+            flowtype = me.data.flowType,
+            piid = me.data.piid,
+            nodeid = me.data.nodeid,
+            taskinstid = me.data.taskinstid,
+            hasOperator = true,
+            hasRecentConatacts = true,
+            hasProcess = false,
+            currentTab = 1,
+            againstselectself = true,
+            callbackname = 'changecallback';
+
+        if (issigature == 1 && !signid) {
+            NG.showToast({ title: "需要签章，请选择签章", icon: 'success' }); return;
+        }
+
+        me.callbackname = function(selectlist){
+            if(selectlist.length != 1){
+                NG.showToast({ title: "只能选择一位转签人", icon: 'success' });
+                return;
+            } 
+             var params = {
+                method: 'Transmit',
+                flowType: flowtype,
+                piid: piid,
+                nodeid: nodeid,
+                taskinstid: taskinstid,
+                logid: getApp().GLOBAL_CONFIG.userId,
+                remark: comments,
+                signcode: signid,
+                audioremark: '',
+                transmituser: selectlist[0].usercode
+            };
+            me.AFRequst('TaskInstance', params, function (resp) {
+                if (resp.status == 'succeed') {
+                    NG.showToast({ title: "转签成功", icon: 'success' });
+                    //存入localStroge中
+                    var recentcontacts = wx.getStorageSync('recentcontacts');
+                    recentcontacts.push({
+                        usercode: selectlist[0].usercode,
+                        username: selectlist[0].username});
+                    wx.setStorage({
+                      key: 'recentcontacts',
+                      data: recentcontacts
+                    })
+
+                    wx.navigateBack({ delta: 2 });
+                }
+                else {
+                    NG.showToast({ title: '转签失败：' + resp.errms, icon: 'success' });
+                }
+            });
+        }
+
+        wx.navigateTo({
+          url: '/pages/appflow/operatorhelp/operatorhelp?hasOperator='+hasOperator+'&hasRecentConatacts='+hasRecentConatacts+
+            '&hasProcess='+hasProcess+'&currentTab='+currentTab+"&againstselectself="+againstselectself+
+            '&callbackname='+callbackname
+        })
+    },
 
     ////////////////////////////自建方法/////////////////////////////////////////
     //获取列表详情
