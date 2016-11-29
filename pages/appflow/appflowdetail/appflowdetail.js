@@ -100,6 +100,33 @@ Page({
 
     },
     onShow: function(){
+        var me = this,
+            selectlist = getApp().selectlist.slice();
+        
+        //从下级节点办理人页返回
+        if(selectlist.length>0){
+            var currentNode = selectlist[0].nodeid,
+                nodePerson = me.data.nodePerson;
+            nodePerson[currentNode] = [];
+            for(var i in selectlist){
+                nodePerson[currentNode].push(selectlist[i]);
+            }
+            //更改视图绑定数据
+            var nextNodeDesignateActor = me.data.taskInfo.nextNodeDesignateActor;
+            for(var i in nextNodeDesignateActor){
+                for(var j in selectlist){
+                    if(nextNodeDesignateActor[i].nodeid == currentNode){
+                        nextNodeDesignateActor[i].checkbox = 0;
+                        if(nextNodeDesignateActor[i].usercode == selectlist[j].usercode){
+                                nextNodeDesignateActor[i].checkbox = 2;
+                        }
+                    }
+                }
+            }
+            me.setData({taskInfo: me.data.taskInfo});
+            getApp().selectlist = [];
+        }
+        
 
     },
     onHide: function(){
@@ -255,7 +282,8 @@ Page({
             currentTab = 2,
             flowType = me.data.flowType,
             piid = me.data.piid,
-            nodeid = id;
+            nodeid = id,
+            againstselectself = false;
         for(var i in me.data.taskInfo.nextNodes){
             if(id == me.data.taskInfo.nextNodes[i].nodeid){
                 var designate_anyactor = me.data.taskInfo.nextNodes[i].designate_anyactor;
@@ -270,7 +298,7 @@ Page({
 
         wx.navigateTo({
           url: '/pages/appflow/operatorhelp/operatorhelp?hasOperator='+hasOperator+'&hasRecentConatacts='+hasRecentConatacts+
-            '&hasProcess='+hasProcess+'&flowType='+flowType+'&piid='+piid+'&nodeid='+nodeid+'&currentTab='+currentTab
+            '&hasProcess='+hasProcess+'&flowType='+flowType+'&piid='+piid+'&nodeid='+nodeid+'&currentTab='+currentTab+"&againstselectself="+againstselectself
         })
         
     },

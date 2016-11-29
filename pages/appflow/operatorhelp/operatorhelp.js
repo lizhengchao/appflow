@@ -30,6 +30,7 @@ Page({
 
 
         ////////////////////////////输入的交互数据/////////////////////////
+        againstselectself: true,  //能否选择自己
         currentTab: 0, //当前选择的tab页 0:操作员页  1:最近联系人页
         selectlist: [], //已选择的操作员
         searchtext: ''  //搜索条件
@@ -40,8 +41,10 @@ Page({
             hasOperator = option.hasOperator,
             hasRecentConatacts = option.hasRecentConatacts,
             hasProcess = option.hasProcess,
-            currentTab = option.currentTab;
+            currentTab = option.currentTab,
+            againstselectself = option.againstselectself;
         
+        me.data.againstselectself = againstselectself === 'true'? true:false;
         me.data.operatorconfig.hasOperator = hasOperator === 'true'? true:false;
         me.data.contactsconfig.hasRecentConatacts = hasRecentConatacts === 'true'? true:false;
         me.data.processconfig.hasProcess = hasProcess === 'true'? true:false;
@@ -54,6 +57,7 @@ Page({
         
 
         me.setData({
+            againstselectself: me.data.againstselectself,
             operatorconfig: me.data.operatorconfig,
             contactsconfig: me.data.contactsconfig,
             processconfig: me.data.processconfig,
@@ -105,15 +109,15 @@ Page({
             currentOperator = me.data.processlist[id];
         }
 
-        if(!currentOperator.check || currentOperator.check == 0){
-            if(currentOperator.usercode == getApp().GLOBAL_CONFIG.userId){
+        if(!currentOperator.checkbox || currentOperator.checkbox == 0){
+            if(me.data.againstselectself && currentOperator.usercode == getApp().GLOBAL_CONFIG.userId){
                 NG.showToast({title: '无法选择自己', icon: 'success'});
                 return;
             }
-            currentOperator.check = 1;
+            currentOperator.checkbox = 1;
             selectlist.push(currentOperator);
         } else {
-            currentOperator.check = 0;
+            currentOperator.checkbox = 0;
             selectlist.splice(id, 1);
         }
 
