@@ -15,13 +15,7 @@
     "list": [
     {
       "pagePath": "pages/appflow/appflowlist/appflowlist",
-      "text": "审批任务",
-      "iconPath": "",
-      "selectedIconPath": ""
-    },
-    {
-      "pagePath": "pages/appflow/appflowdetail/rejectpanel/rejectpanel",
-      "text": "驳回测试"
+      "text": "审批任务"
     }]
   }
 }

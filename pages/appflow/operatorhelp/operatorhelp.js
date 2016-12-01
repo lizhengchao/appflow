@@ -78,7 +78,7 @@ Page({
             searchtext: value.detail.value
         })
         if(me.data.currentTab == 0){
-             me.AFRequst('TaskInstance', {
+             NG.AFRequst('TaskInstance', {
                 'method': 'GetAllUser',
                 'filter': me.data.searchtext,
                 'pageindex': 1,
@@ -147,7 +147,7 @@ Page({
                 pagesize = me.data.operatorconfig.pagesize,
                 searchtext = me.data.searchtext,
                 start = (pageindex-1)*pagesize;
-            me.AFRequst('TaskInstance', {
+            NG.AFRequst('TaskInstance', {
                 'method': 'GetAllUser',
                 'filter': searchtext,
                 'pageindex': pageindex,
@@ -165,7 +165,7 @@ Page({
                 pagesize = me.data.processconfig.pagesize,
                 searchtext = me.data.searchtext,
                 start = (pageindex-1)*pagesize;
-            me.AFRequst('TaskInstance', {
+            NG.AFRequst('TaskInstance', {
                 'method': 'GetNodeUsers',
                 'logid': getApp().GLOBAL_CONFIG.userId,
                 'flowType': me.data.processconfig.flowType,
@@ -221,29 +221,6 @@ Page({
     },
 
     /////////////////////////////自建方法//////////////////////////////////////
-    //审批流请求
-    AFRequst: function (funcname, params, callback) {
-        var me = this;
-        wx.request({
-          url: getApp().GLOBAL_CONFIG.productAdr + "/rest/api/workflow/" + funcname + "/Get",
-          data: util.parseParam(params),
-          method: 'POST', 
-          header: {
-            'Cookie': wx.getStorageSync('Cookie'),
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-          },
-          success: function(res){
-            if(res.data.status){
-                callback(res.data);
-            } else {
-                NG.showToast({title:'服务器接口异常', icon: 'success'});
-            }
-          },
-          fail: function(res) {
-            NG.showToast({title:'连接服务器失败', icon: 'success'});
-          }
-        })
-    },
 
     initListData: function(){
         var me = this,
@@ -259,7 +236,7 @@ Page({
         
         //获取操作员数据
         if(hasOperator){
-            me.AFRequst('TaskInstance', {
+            NG.AFRequst('TaskInstance', {
                 'method': 'GetAllUser',
                 'filter': '',
                 'pageindex': 1,
@@ -284,7 +261,7 @@ Page({
             (function(){
                 var pageindex = me.data.processconfig.pageindex,
                     pagesize = me.data.processconfig.pagesize;
-                me.AFRequst('TaskInstance', {
+                NG.AFRequst('TaskInstance', {
                     'method': 'GetNodeUsers',
                     'logid': getApp().GLOBAL_CONFIG.userId,
                     'flowType': me.data.processconfig.flowType,

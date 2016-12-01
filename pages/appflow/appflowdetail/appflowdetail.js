@@ -29,7 +29,7 @@ Page({
         ],
         nodedisplay: {  
             nextnode: 'block',  //“下一个节点”是否显示
-            handlepeople: 'none', //“指派下级节点办理人”是否显示
+            handlepeople: 'none' //“指派下级节点办理人”是否显示
         },
         taskInfo: {
 
@@ -186,7 +186,7 @@ Page({
             }
         }
         me.setData({
-            currentnodeids: me.data.currentnodeids,
+            currentnodeids: me.data.currentnodeids
         })
 
         //加入到交互数据
@@ -392,7 +392,7 @@ Page({
                 logid: getApp().GLOBAL_CONFIG.userId
             };
 
-        me.AFRequst('TaskInstance', params, function (resp) {
+        NG.AFRequst('TaskInstance', params, function (resp) {
             if (resp.status == 'succeed') {
                 if (resp.rollBackNodes.length == 0) {
                     NG.showToast({ title: '该流程已过审批节点，不支持驳回操作', icon: 'success' });
@@ -469,7 +469,7 @@ Page({
                 nextnodeactors: dealArray
             };
 
-        me.AFRequst('TaskInstance', params, function(data){
+        NG.AFRequst('TaskInstance', params, function(data){
             NG.showToast({ title: '提交成功', icon: 'success' });
             wx.navigateBack();
         })
@@ -497,7 +497,7 @@ Page({
                     audioremark: ''
                 };
 
-                me.AFRequst('TaskInstance', parms, function (resp) {
+                NG.AFRequst('TaskInstance', parms, function (resp) {
                     if (resp.status == 'succeed') {
                         wx.navigateBack({ delta: 1 });
                     }
@@ -536,7 +536,7 @@ Page({
             for(var i in selectlist){
                 pArr.push(selectlist[i].usercode);
             }
-            me.AFRequst('TaskInstance', {
+            NG.AFRequst('TaskInstance', {
                 method: 'addtis',
                 logid: getApp().GLOBAL_CONFIG.userId,
                 flowType: flowtype,
@@ -605,7 +605,7 @@ Page({
                 audioremark: '',
                 transmituser: selectlist[0].usercode
             };
-            me.AFRequst('TaskInstance', params, function (resp) {
+            NG.AFRequst('TaskInstance', params, function (resp) {
                 if (resp.status == 'succeed') {
                     NG.showToast({ title: "转签成功", icon: 'success' });
                     //存入localStroge中
@@ -659,7 +659,7 @@ Page({
             }
         }
 
-        me.AFRequst('TaskInstance', params, successcallback)
+        NG.AFRequst('TaskInstance', params, successcallback)
     },
 
     //初始化上方选择按钮
@@ -1088,7 +1088,7 @@ Page({
                 flowType: me.data.flowtype,
                 piid: me.data.piid
             };
-        me.AFRequst('TaskInstance', parms, function (resp) {
+        NG.AFRequst('TaskInstance', parms, function (resp) {
             if (resp.status == 'succeed') {
                 if (resp.type.toUpperCase() == 'URL' && resp.data) {
                     callback && callback(resp);
@@ -1137,29 +1137,5 @@ Page({
             me.setData({
                 toolbars: me.data.toolbars
             });
-    },
-
-    //审批流请求
-    AFRequst: function (funcname, params, callback) {
-        var me = this;
-        wx.request({
-          url: getApp().GLOBAL_CONFIG.productAdr + "/rest/api/workflow/" + funcname + "/Get",
-          data: util.parseParam(params),
-          method: 'POST', 
-          header: {
-            'Cookie': wx.getStorageSync('Cookie'),
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-          },
-          success: function(res){
-            if(res.data.status){
-                callback(res.data);
-            } else {
-                NG.showToast({title:'服务器接口异常', icon: 'success'});
-            }
-          },
-          fail: function(res) {
-            NG.showToast({title:'连接服务器失败', icon: 'success'});
-          }
-        })
     }
 })

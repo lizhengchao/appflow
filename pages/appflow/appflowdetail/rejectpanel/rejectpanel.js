@@ -168,7 +168,7 @@ Page({
                 nextnodeactors: dealArray
             };
         
-        me.AFRequst("TaskInstance", params, function(data){
+        NG.AFRequst("TaskInstance", params, function(data){
             if(data.status=="succeed") wx.navigateBack({ delta: 2 });
             else NG.showToast({ title: data.errmsg, icon: 'success' });;
         })
@@ -207,30 +207,6 @@ Page({
         me.setData({
             rollBackInfo: me.data.rollBackInfo,
             handlepeopledisplay: me.data.handlepeopledisplay
-        })
-    },
-
-    //审批流请求
-    AFRequst: function (funcname, params, callback) {
-        var me = this;
-        wx.request({
-          url: getApp().GLOBAL_CONFIG.productAdr + "/rest/api/workflow/" + funcname + "/Get",
-          data: util.parseParam(params),
-          method: 'POST', 
-          header: {
-            'Cookie': wx.getStorageSync('Cookie'),
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-          },
-          success: function(res){
-            if(res.data.status){
-                callback(res.data);
-            } else {
-                NG.showToast({title:'服务器接口异常', icon: 'success'});
-            }
-          },
-          fail: function(res) {
-            NG.showToast({title:'连接服务器失败', icon: 'success'});
-          }
         })
     }
 })

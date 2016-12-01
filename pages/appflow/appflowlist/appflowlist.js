@@ -136,10 +136,18 @@ Page({
         kernel = getApp().GLOBAL_CONFIG.requestAdr.kernel,
         me = this;
       wx.request({
-        url: productAdr+kernel,
+        // url: productAdr+kernel,
+        // data: {
+        //   'loginid': loginid,
+        //   'isapp': isapp
+        // },
+        url: getApp().GLOBAL_CONFIG.redirectAdr,
         data: {
-          'loginid': loginid,
-          'isapp': isapp
+          requestType: 'get',
+          requestAds: productAdr+kernel,
+          loginid: loginid,
+          isapp: isapp
+
         },
         method: 'GET',
         success: function(res){
@@ -152,7 +160,7 @@ Page({
           } else {
             //将获取到的cookie塞到localstorge
             //TODO
-            var cookie = 'ASP.NET_SessionId=jkhx2x45o0delc45gljtbpfr';
+            var cookie = 'ASP.NET_SessionId=0wynep45hwmduz553p35it55';
             wx.setStorageSync('Cookie', cookie);
             successcallback({
               loginid: loginid,
@@ -189,14 +197,25 @@ Page({
       }
 
       wx.request({
-        url: productAdr+getTaskList,
+        // url: productAdr+getTaskList,
+        // data: {
+        //   'method': method,
+        //   'logid': loginid,
+        //   'pageindex': pageindex,
+        //   'start': start,
+        //   'pagesize': pagesize,
+        //   'myflowtype': myflowtype
+        // },
+        url: getApp().GLOBAL_CONFIG.redirectAdr,
         data: {
-          'method': method,
-          'logid': loginid,
-          'pageindex': pageindex,
-          'start': start,
-          'pagesize': pagesize,
-          'myflowtype': myflowtype
+          requestType: 'get',
+          requestAds: productAdr+getTaskList,
+          method: method,
+          logid: loginid,
+          pageindex: pageindex,
+          start: start,
+          pagesize: pagesize,
+          myflowtype: myflowtype
         },
         method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         header: {'Cookie': cookie},

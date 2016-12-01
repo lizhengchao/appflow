@@ -25,6 +25,7 @@ App({
     }
   },
   GLOBAL_CONFIG:{
+    'redirectAdr': 'https://www.netcall.cc:83/Redirect/jsonResult',
     'productAdr' :'http://218.108.53.100:8081',
     'requestAdr': {
       'kernel': '/rest/api/kernelsession',
