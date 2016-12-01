@@ -1,5 +1,5 @@
-var util = require("../../../utils/util")
-var NG = require("../../../extra/NG")
+var util = require("../../../utils/util.js");
+var NG = require("../../../extra/NG.js");
 Page({
     data:{
       tabselectordata: [{
@@ -153,14 +153,14 @@ Page({
         success: function(res){
           if(res.data.status != 'Success'){
             NG.showToast({
-                title: res.data.errmsg,
+                title: '模拟登陆接口失败',
                 icon: 'success'
             });
             return;
           } else {
             //将获取到的cookie塞到localstorge
             //TODO
-            var cookie = 'ASP.NET_SessionId=0wynep45hwmduz553p35it55';
+            var cookie = 'ASP.NET_SessionId=duryra45g3lu0m552krbbv45';
             wx.setStorageSync('Cookie', cookie);
             successcallback({
               loginid: loginid,
@@ -168,7 +168,8 @@ Page({
             });
           }
         },
-        fail: function() {
+        fail: function(res) {
+          console.log(res.errMsg);
         },
         complete: function() {
         }
@@ -220,7 +221,7 @@ Page({
         method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         header: {'Cookie': cookie},
         success: function(res){
-          if(res.data.status == "succeed"){
+          if(res.data.status && res.data.status == "succeed"){
             me.data.appflows.appflowlist = me.data.appflows.appflowlist.concat(res.data.data);
             me.data.appflows.rowcount = res.data.rowcount;
             me.data.appflows.pageindex = pageindex;
@@ -231,7 +232,7 @@ Page({
             if(typeof successcallback == 'function') successcallback(res);
           } else {
             NG.showToast({
-                title: res.data.errmsg,
+                title: '服务接口异常',
                 icon: 'success'
             });
           }

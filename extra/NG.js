@@ -31,10 +31,10 @@ function AFRequst(funcname, params, callback) {
     //     NG.showToast({title:'连接服务器失败', icon: 'success'});
     //     }
     // })
-    params.requestType = 'post';
-    params.requestAds = getApp().GLOBAL_CONFIG.productAdr + "/rest/api/workflow/" + funcname + "/Get";
+    var me = this;
     wx.request({
-        url:  getApp().GLOBAL_CONFIG.redirectAdr,
+        url:  getApp().GLOBAL_CONFIG.redirectAdr+"?requestType=post&requestAds="+
+            getApp().GLOBAL_CONFIG.productAdr + "/rest/api/workflow/" + funcname + "/Get",
         data: util.parseParam(params),
         method: 'POST', 
         header: {
@@ -42,14 +42,14 @@ function AFRequst(funcname, params, callback) {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
         },
         success: function(res){
-        if(res.data.status){
+        if(res.data.status && res.data.status == 'succeed'){
             callback(res.data);
         } else {
-            NG.showToast({title:'服务器接口异常', icon: 'success'});
+            me.showToast({title:JSON.stringify(res.data), icon: 'success'});
         }
         },
         fail: function(res) {
-        NG.showToast({title:'连接服务器失败', icon: 'success'});
+        me.showToast({title:'连接服务器失败', icon: 'success'});
         }
     })
 }

@@ -1,5 +1,5 @@
 var util = require("../../../utils/util");
-var NG = require("../../../extra/NG")
+var NG = require("../../../extra/NG");
 Page({
     data: {
         ////////////////////////////页面绑定数据/////////////////////////////////////////
@@ -9,22 +9,18 @@ Page({
             'none',
             'none'
         ],
-        taskdisplay: [ //几个可展开的模块是否显示，默认不显示
+        taskdisplay: [ //几个可展开的模块是否显示，1:展示， 0：不展示
             {
-                display: 'none',
-                iconname: 2
+                display: 1
             },
             {
-                display: 'none',
-                iconname: 2
+                display: 1
             },
             {
-                display: 'none',
-                iconname: 2
+                display: 0
             },
             {
-                display: 'none',
-                iconname: 2
+                display: 0
             }
         ],
         nodedisplay: {  
@@ -115,14 +111,10 @@ Page({
     tasktap: function(e){
         var id = e.currentTarget.id.substring(0,1),
             taskdetaildisplay = this.data.taskdisplay[id];
-        if(taskdetaildisplay.display == 'block' 
-            && taskdetaildisplay.iconname == 1){
-                taskdetaildisplay.display = 'none';
-                taskdetaildisplay.iconname = 2;
-        } else if(taskdetaildisplay.display == 'none' 
-            && taskdetaildisplay.iconname == 2){
-                taskdetaildisplay.display = 'block';
-                taskdetaildisplay.iconname = 1;
+        if(taskdetaildisplay.display == 1){
+            taskdetaildisplay.display = 0;
+        } else if(taskdetaildisplay.display == 0){
+            taskdetaildisplay.display = 1;
         }
         this.setData({
             taskdisplay: this.data.taskdisplay
@@ -265,6 +257,8 @@ Page({
                     hasOperator = false;
                 } else {
                     hasOperator = true;
+                    hasProcess = false; //可以选择系统所有人员则不需要选择当前节点可选办理人
+                    currentTab = 0;
                 }
                 break;
             }
@@ -289,6 +283,7 @@ Page({
                             nextNodeDesignateActor[i].checkbox = 0;
                             if(nextNodeDesignateActor[i].usercode == selectlist[j].usercode){
                                     nextNodeDesignateActor[i].checkbox = 2;
+                                    break;
                             }
                         }
                     }

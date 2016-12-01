@@ -1,8 +1,8 @@
 <view class="taskrow">
             <text>任务详情</text>
-            <image src="../../../resource/image/newicon/{{taskdisplay[0].iconname == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='0tap'></image>
+            <image src="../../../resource/image/newicon/{{taskdisplay[0].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='0tap'></image>
         </view>
-        <view class="taskdetailcontanier" style="display:{{taskdisplay[0].display}}">
+        <view class="taskdetailcontanier" style="display:{{taskdisplay[0].display == 1? 'block':'none'}}">
             <block wx:if="{{pageType == 'Edit' || pageType == 'View_OAWF'}}">
                 <view class="taskdetailrow">
                     <view class="taskdetailrowname">任务描述</view>
@@ -43,9 +43,9 @@
         <view class="intervalrow"></view>
         <view class="taskrow">
             <text>流转历史</text>
-            <image src="../../../resource/image/newicon/{{taskdisplay[1].iconname == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='1tap'></image>
+            <image src="../../../resource/image/newicon/{{taskdisplay[1].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='1tap'></image>
         </view>
-        <view class="historycontanier" style="display: {{taskdisplay[1].display}}">
+        <view class="historycontanier" style="display: {{taskdisplay[1].display == 1? 'block':'none'}}">
             <block wx:for='{{taskInfo.flowHistory}}'>
                 <view class="historyrow">
                 <view class="histortext3">{{item.remark}}</view>
@@ -77,10 +77,10 @@
                 <view class="intervalrow"></view>
                 <view class="taskrow">
                     <text>下一个节点</text>
-                    <image src="../../../resource/image/newicon/{{taskdisplay[2].iconname == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='2tap'></image>
+                    <image src="../../../resource/image/newicon/{{taskdisplay[2].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='2tap'></image>
                 </view>
                 <block wx:for="{{taskInfo.nextNodes}}">
-                    <view class="nextpoint" style="display: {{taskdisplay[2].display}}">
+                    <view class="nextpoint" style="display: {{taskdisplay[2].display == 1? 'block':'none'}}">
                         <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
                             class="nextpointimage" id="{{index}}" bindtap="tasknodetap"></image>
                         <text>{{item.nodetext}}</text>
@@ -92,9 +92,9 @@
                 <view class="intervalrow"></view>
                 <view class="taskrow">
                     <text>指派下级节点办理人</text>
-                    <image src="../../../resource/image/newicon/{{taskdisplay[3].iconname == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='3tap'></image>
+                    <image src="../../../resource/image/newicon/{{taskdisplay[3].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='3tap'></image>
                 </view>
-                <view class="handlepeople" style="display: {{taskdisplay[3].display}}">
+                <view class="handlepeople" style="display: {{taskdisplay[3].display == 1? 'block':'none'}}">
                     <block wx:for="{{currentnodeids}}"  wx:for-item="currentnodeid">
                         <view class="tasknode">任务节点</view>
                         <view class="nodecontanier">
