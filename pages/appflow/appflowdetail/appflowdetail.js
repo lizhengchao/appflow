@@ -436,7 +436,7 @@ Page({
 
     },
 
-    //单据截图点击
+    //单据截图点击事件
     screenshottap: function(e){
         var me  = this,
             id = e.currentTarget.id,
@@ -960,7 +960,7 @@ Page({
 
         var bizData = me.data.taskInfo.bizData;
         if (bizData && bizType != "RW_ReportApply" && bizType != "AQ_CHK_M" && bizType != "AQ_CHK_M2") { //报表审批,现场检查单独处理
-            if (me.pageType == "Edit") {
+            if (me.data.pageType == "Edit") {
                 me.getExpMapFromBizData(bizData);
             }
             var mainItems = [], detailItems = [],
@@ -1062,7 +1062,7 @@ Page({
     getExpMapFromBizData: function(bizData) {
         var me = this,
             matchArray, match, field, item;
-        me.ExpMap = {};
+        me.data.ExpMap = {};
 
         for (var i = 0, len1 = bizData.length; i < len1; i++) {
             item = bizData[i];
@@ -1073,11 +1073,11 @@ Page({
                     matchArray = field.ComputeExpr.match(/\{([^\{\}]+)\}/g);
                     for (var k = 0, len = matchArray.length; k < len; k++) {
                         match = matchArray[k].substring(1, matchArray[k].length - 1).replace(/\./g, '-');
-                        if (!me.ExpMap[match]) {
-                            me.ExpMap[match] = [];
+                        if (!me.data.ExpMap[match]) {
+                            me.data.ExpMap[match] = [];
                         }
-                        if (me.ExpMap[match].indexOf(name) < 0) {
-                            me.ExpMap[match].push(name);
+                        if (me.data.ExpMap[match].indexOf(name) < 0) {
+                            me.data.ExpMap[match].push(name);
                         }
                     }
                 }
@@ -1097,7 +1097,7 @@ Page({
         field.id = name;
         field.label = item.FieldDesc;
         field.value = values.DisplayValue;
-        if (item.FieldType == "binary") { // 二进制数据，设置链接点击查看
+        if (item.FieldType == "binary") { // 二进制数据，设置链接点击查看， TODO
             field.xtype = "ngviewtext";
             field.value = '<div class="btn-url" style="color: #3993db; text-decoration: underline; width: 100%;line-height: 30px;">查看</div>';
             if (item.FieldCode == "uploadimage" && Ext.isEmpty(values.DisplayValue)) {
@@ -1117,7 +1117,7 @@ Page({
                 }
             };
         }
-        if (me.pageType == "Edit") {
+        if (me.data.pageType == "Edit") {
             field.expr = item.ComputeExpr;
             field.table = table;
             field.fieldType = item.FieldType;
@@ -1127,7 +1127,7 @@ Page({
             if (item.ColtrolValue != 0 && item.FieldType != "binary") { // 可编辑
                 field.inputCls = "x-input-edit";
                 field.readOnly = false;
-                me.hasFieldEdit = true; //标识当前表单有可编辑字段
+                me.data.hasFieldEdit = true; //标识当前表单有可编辑字段
                 field.required = item.ColtrolValue == 3;
                 if (item.HelpString) { // 需要调用通用帮助
                     field.xtype = "ngcommonhelp";
@@ -1149,7 +1149,7 @@ Page({
                         field.value = new Date(values.DisplayValue);
                         field.isNull = false;
                     }
-                } else if (!field.readOnly && me.ExpMap[name.replace(/-\d+$/, '')]) {
+                } else if (!field.readOnly && me.data.ExpMap[name.replace(/-\d+$/, '')]) {
                     hasKeyUp = true;
                     field.listeners = {
                         initialize: function (fd) {
@@ -1172,7 +1172,7 @@ Page({
                                         if (target.value != currV) {
                                             target.value = currV;
                                         }
-                                        me.calcExpDirs = []; //清空计算路径
+                                        me.data.calcExpDirs = []; //清空计算路径
                                    //TODO:     me.onFieldKeyUp(e.delegatedTarget, fd.config.table, fd.config.fieldType);
                                     }
                                 }
@@ -1180,14 +1180,14 @@ Page({
                         }
                     };
                 }
-                if(!hasKeyUp && me.ExpMap[name.replace(/-\d+$/, '')]) {
+                if(!hasKeyUp && me.data.ExpMap[name.replace(/-\d+$/, '')]) {
                     field.listeners = {
                         initialize: function (fd) {
                             fd.on({
                                 change: function (c, nValue, oValue) {
                                     var el = c.element.down("input");
                                     if (el && el.dom) {
-                                        me.calcExpDirs = []; //清空计算路径
+                                        me.data.calcExpDirs = []; //清空计算路径
                                  //TODO:       me.onFieldKeyUp(el.dom, fd.config.table, fd.config.fieldType);
                                     }
                                 }
