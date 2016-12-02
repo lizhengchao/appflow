@@ -48,7 +48,7 @@ Page({
 
        ////////////////////////////输入的交互数据/////////////////////////////////////////
         comments: '', //审批意见
-        signid: '', //签章id，暂时未做签章
+        signid: '', //签章id
         nodeArray: [], //当前已选择的下级节点
         nodePerson: [] //当前已选择的下级节点办理人,多个节点，每个节点对应对多个办理人
     },
@@ -136,6 +136,38 @@ Page({
             comments: me.data.comments
         })
 
+    },
+
+    //签章按钮
+    signtap: function(e){
+        var me = this,
+            callbackname = "signcallback";
+        
+        var params = {
+            logid: getApp().GLOBAL_CONFIG.userId,
+            method: 'GetAllSignature',
+            flowType: 'af'
+        };
+        NG.AFRequst('TaskInstance', params, function(data){
+            if(data.status == "succeed"){
+                if(data.data.length>0){
+                    me.callbackname = function (ccode) {
+                        me.setData({
+                            signid: ccode
+                        })
+                    }
+                    wx.navigateTo({
+                        url: '/pages/appflow/appflowdetail/stamplist/stamplist?callbackname'+callbackname
+                    })
+                } else {
+                    NG.showToast({title: '无签章数据', icon: 'success'});
+                }
+            } else {
+                NG.showToast({title: '服务接口异常：'+JSON.stringify(data), icon: 'success'})
+            }
+        })
+
+        
     },
 
     //下级节点选择按钮

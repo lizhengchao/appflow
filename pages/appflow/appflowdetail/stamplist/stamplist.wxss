@@ -1,0 +1,35 @@
+.rowcontainer {
+    height: 90%
+}
+.row {
+    border-bottom: 2rpx solid #f2f2f2;
+    padding: 22rpx 32rpx
+}
+.checkimg {
+    width: 30px;
+    height: 30px;
+    float: left;
+}
+.signimg {
+    margin-left: 12px;
+    margin-top: 0px;
+    width: 60px;
+    height: 30px;
+    float: left;
+}
+.textinput {
+    width: 150px;
+    height: 30px;
+    float: right;
+    border: 2rpx solid #a9a9a9
+}
+.placeholderstyle {
+    color: #a9a9a9
+}
+.buttoncontainer {
+    position: absolute;
+    height: 10%;
+    width: 100%;
+    bottom: 0rpx;
+    left: 0rpx
+}

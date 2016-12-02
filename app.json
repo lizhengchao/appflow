@@ -3,6 +3,7 @@
     "pages/appflow/appflowlist/appflowlist",
     "pages/appflow/appflowdetail/appflowdetail",
     "pages/appflow/appflowdetail/rejectpanel/rejectpanel",
+    "pages/appflow/appflowdetail/stamplist/stamplist",
     "pages/appflow/operatorhelp/operatorhelp"
   ],
   "window":{
@@ -16,6 +17,10 @@
     {
       "pagePath": "pages/appflow/appflowlist/appflowlist",
       "text": "审批任务"
+    },
+    {
+      "pagePath": "pages/appflow/appflowdetail/stamplist/stamplist",
+      "text": "签章列表测试"
     }]
   }
 }

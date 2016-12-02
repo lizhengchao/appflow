@@ -63,7 +63,7 @@
                     <textarea class="adivcecontent" placeholder="审批意见" placeholder-class="placeholder" bindblur="commentsChange" value="{{comments}}"></textarea>
                     <view>
                         <image src="../../../resource/image/newicon/u167.png" class="tagicon"></image>
-                        <image src="../../../resource/image/newicon/u169.png" class="tagicon" style="margin-top: 20rpx"></image>
+                        <image src="../../../resource/image/newicon/u169.png" class="tagicon" style="margin-top: 20rpx" bindtap="signtap"></image>
                     </view>
                 </view>
                 <view class="advicecontanier1">
