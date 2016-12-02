@@ -1,6 +1,6 @@
 <block wx:for="{{formAttachment}}">
     <view class="attachmentcontainer" id="{{index}}">
-        <image src="../../../resource/image/word.png" class="attachimg">Content</image>
+        <image src="{{resourceAdr}}/word.png" class="attachimg">Content</image>
         <view class="attachdes">
             <text class="attachtitle">{{item.attachname}}</text>
         </view>
@@ -17,9 +17,15 @@
     </block>
     <block wx:if="{{item.isScreenshot}}">
         <view class="formrow">
-            <view class="formrowtitle">{{item.label}}</view>
-            <image src='../../../resource/image/form.png' class="screenshotimg1"></image>
-            <image src='../../../resource/image/search_y.png' class="screenshotimg2"></image>
+            <block wx:if="{{item.label == '单据截图'}}">
+                <view class="formrowtitle">单据截图</view>
+                <image src='{{resourceAdr}}/form.png' class="screenshotimg1"></image>
+                <image src='{{resourceAdr}}/search_y.png' class="screenshotimg2" id="{{index}}" bindtap="screenshottap"></image>
+            </block>
+            <block wx:if="{{item.label == '无'}}">
+                <view class="formrowtitle">单据截图</view>
+                <view>无</view>
+            </block>
         </view>
     </block>
 </block>

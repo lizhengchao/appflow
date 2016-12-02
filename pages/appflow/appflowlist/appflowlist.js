@@ -13,6 +13,7 @@ Page({
         seltype: 1
       }],
       curentseltype: 0,
+      resourceAdr: getApp().GLOBAL_CONFIG.resourceAdr,
       appflows: {
         appflowlist: [],
         rowcount: 0,
@@ -160,7 +161,7 @@ Page({
           } else {
             //将获取到的cookie塞到localstorge
             //TODO
-            var cookie = 'ASP.NET_SessionId=duryra45g3lu0m552krbbv45';
+            var cookie = 'ASP.NET_SessionId=netgyza3vnoif0jr40zjyryt';
             wx.setStorageSync('Cookie', cookie);
             successcallback({
               loginid: loginid,

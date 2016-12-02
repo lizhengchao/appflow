@@ -25,6 +25,7 @@ App({
     }
   },
   GLOBAL_CONFIG:{
+    'resourceAdr': 'https://www.netcall.cc/resources/images',
     'redirectAdr': 'https://www.netcall.cc/Redirect/jsonResult',
     'productAdr' :'http://218.108.53.100:8081',
     'requestAdr': {

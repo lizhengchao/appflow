@@ -1,6 +1,6 @@
 <view class="taskrow">
             <text>任务详情</text>
-            <image src="../../../resource/image/newicon/{{taskdisplay[0].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='0tap'></image>
+            <image src="{{resourceAdr}}/newicon/{{taskdisplay[0].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='0tap'></image>
         </view>
         <view class="taskdetailcontanier" style="display:{{taskdisplay[0].display == 1? 'block':'none'}}">
             <block wx:if="{{pageType == 'Edit' || pageType == 'View_OAWF'}}">
@@ -43,7 +43,7 @@
         <view class="intervalrow"></view>
         <view class="taskrow">
             <text>流转历史</text>
-            <image src="../../../resource/image/newicon/{{taskdisplay[1].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='1tap'></image>
+            <image src="{{resourceAdr}}/newicon/{{taskdisplay[1].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='1tap'></image>
         </view>
         <view class="historycontanier" style="display: {{taskdisplay[1].display == 1? 'block':'none'}}">
             <block wx:for='{{taskInfo.flowHistory}}'>
@@ -62,10 +62,16 @@
                 <view class="advicecontanier0">
                     <textarea class="adivcecontent" placeholder="审批意见" placeholder-class="placeholder" bindblur="commentsChange" value="{{comments}}"></textarea>
                     <view>
-                        <image src="../../../resource/image/newicon/u167.png" class="tagicon"></image>
-                        <image src="../../../resource/image/newicon/u169.png" class="tagicon" style="margin-top: 20rpx" bindtap="signtap"></image>
+                        <image src="{{resourceAdr}}/newicon/u167.png" class="tagicon" bindtouchstart="startrecord" bindtouchend="endrecord"></image>
+                        <image src="{{signimg? signimg : resourceAdr + '/newicon/u169.png'}}" class="tagicon" style="margin-top: 20rpx" bindtap="signtap"></image>
                     </view>
                 </view>
+                <block wx:if="{{temprecordpath}}">
+                <view class="radiocontainer">
+                    <image class="radioimg" src="{{resourceAdr}}/newicon/u131.png" bindtap="playrecord">Content</image>
+                    <view class="radiodelete" bindtap="deleterecord">删除</view>
+                </view>
+                </block>
                 <view class="advicecontanier1">
                     <block wx:for="{{taskInfo.commonWord}}">
                     <button class="advicebutton" id="{{index}}" bindtap="advicebtntap">{{item.text}}</button>
@@ -77,11 +83,11 @@
                 <view class="intervalrow"></view>
                 <view class="taskrow">
                     <text>下一个节点</text>
-                    <image src="../../../resource/image/newicon/{{taskdisplay[2].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='2tap'></image>
+                    <image src="{{resourceAdr}}/newicon/{{taskdisplay[2].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='2tap'></image>
                 </view>
                 <block wx:for="{{taskInfo.nextNodes}}">
                     <view class="nextpoint" style="display: {{taskdisplay[2].display == 1? 'block':'none'}}">
-                        <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
+                        <image src="{{resourceAdr}}/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
                             class="nextpointimage" id="{{index}}" bindtap="tasknodetap"></image>
                         <text>{{item.nodetext}}</text>
                     </view>
@@ -92,7 +98,7 @@
                 <view class="intervalrow"></view>
                 <view class="taskrow">
                     <text>指派下级节点办理人</text>
-                    <image src="../../../resource/image/newicon/{{taskdisplay[3].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='3tap'></image>
+                    <image src="{{resourceAdr}}/newicon/{{taskdisplay[3].display == 1? 'u4.png':'u156.png'}}" class="rowicon" bindtap="tasktap" id='3tap'></image>
                 </view>
                 <view class="handlepeople" style="display: {{taskdisplay[3].display == 1? 'block':'none'}}">
                     <block wx:for="{{currentnodeids}}"  wx:for-item="currentnodeid">
@@ -101,7 +107,7 @@
                             <block wx:for="{{taskInfo.nextNodeDesignateActor}}">
                                 <block wx:if="{{currentnodeid == item.nodeid}}">  <!-- 只显示当前节点对应的办理人 -->
                                     <view class="nodeitem">
-                                        <image src="../../../resource/image/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
+                                        <image src="{{resourceAdr}}/{{item.checkbox==2?'checkbox2.png':'checkbox0.png'}}" 
                                             class="nextpointimage" id="{{index}}" bindtap="handlenodetap"></image>
                                         <text>{{item.username}}</text>
                                     </view>

@@ -2,7 +2,7 @@
     <scroll-view class="rowcontainer" scroll-y="true">
         <block wx:for="{{stamplist}}">
             <view class="row">
-                <image src="../../../../resource/image/{{item.checkbox == 1 ? 'btn_check_on_normal.png' : 'btn_check_off_normal.png'}}" 
+                <image src="{{resourceAdr}}/{{item.checkbox == 1 ? 'btn_check_on_normal.png' : 'btn_check_off_normal.png'}}" 
                     id="{{index}}" class="checkimg" bindtap="itemtap"></image>
                 <image src="data:image/gif;base64,{{item.content}}" class="signimg"></image>
                 <input class="textinput" password="true" placeholder="请输入密码" 

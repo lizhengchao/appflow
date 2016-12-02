@@ -2,7 +2,7 @@
     <block wx:if="{{currentTab == 0}}">
     <view class="searchcontanier">
         <view class="searchfield">
-            <image src="../../../resource/image/search.png" class="searchimg">Content</image>
+            <image src="{{resourceAdr}}/search.png" class="searchimg">Content</image>
             <input placeholder="Search" bindinput="searchinput"></input>
         </view>
     </view>
@@ -10,7 +10,7 @@
     <scroll-view scroll-y="true" bindscrolltolower="listtolower" class="listcontainer">
         <block wx:for="{{currentTab == 0 ? operatorlist : (currentTab == 1 ? contactslist : processlist)}}">
             <view class="itemcontanier">
-                <image src="../../../resource/image/{{item.checkbox == 1 ? 'btn_check_on_normal.png' : 'btn_check_off_normal.png'}}" 
+                <image src="{{resourceAdr}}/{{item.checkbox == 1 ? 'btn_check_on_normal.png' : 'btn_check_off_normal.png'}}" 
                     class="itemimg" id="{{index}}" bindtap="itemtap"></image>
                 <view class="itemtextcontanier">
                     <text>{{item.username + '(' + item.usercode + ')'}}</text>

@@ -7,6 +7,7 @@ Page({
         contactslist: [],   //最近联系人列表,从localstorge中取
         processlist: [],    //流程人员列表
         
+        resourceAdr: getApp().GLOBAL_CONFIG.resourceAdr,
 
         ////////////////////////////逻辑数据////////////////////////////////
         operatorconfig: {

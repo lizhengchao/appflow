@@ -14,10 +14,10 @@ Page({
                 display: 1
             },
             {
-                display: 1
+                display: 0
             },
             {
-                display: 0
+                display: 1
             },
             {
                 display: 0
@@ -37,6 +37,10 @@ Page({
         formData: [], //表单页绑定数据
         formDetailData: [], //表单页详细信息绑定数据
 
+        resourceAdr: getApp().GLOBAL_CONFIG.resourceAdr,
+
+        signimg: '',
+
         ////////////////////////////逻辑数据/////////////////////////////////////////
         flowType: '', piid: '', nodeid: '', taskinstid: '', bizType: '',
         pageType: '',  //页面类型，Edit:代办任务；View: 已办、我发起的任务；View_OAWF:flowtype为oawf的代办任务，在onLoad中初始化
@@ -49,6 +53,8 @@ Page({
        ////////////////////////////输入的交互数据/////////////////////////////////////////
         comments: '', //审批意见
         signid: '', //签章id
+        temprecordpath: '', //录音的临时路径
+        recordid: '', //录音上传服务器后返回的id
         nodeArray: [], //当前已选择的下级节点
         nodePerson: [] //当前已选择的下级节点办理人,多个节点，每个节点对应对多个办理人
     },
@@ -151,10 +157,12 @@ Page({
         NG.AFRequst('TaskInstance', params, function(data){
             if(data.status == "succeed"){
                 if(data.data.length>0){
-                    me.callbackname = function (ccode) {
+                    me.callbackname = function (ccode, signimg) {
+                        wx.navigateBack({ delta: 1 });
                         me.setData({
-                            signid: ccode
-                        })
+                            signid: ccode,
+                            signimg: signimg
+                        });
                     }
                     wx.navigateTo({
                         url: '/pages/appflow/appflowdetail/stamplist/stamplist?callbackname'+callbackname
@@ -166,8 +174,81 @@ Page({
                 NG.showToast({title: '服务接口异常：'+JSON.stringify(data), icon: 'success'})
             }
         })
+    },
 
+    //开始录音
+    startrecord: function(){
+        var me = this;
+        wx.startRecord({
+          success: function(res){
+              me.setData({
+                  temprecordpath: res
+              })
+              NG.showToast({title: '录音成功， res: ' + res, icon: 'success'});
+          },
+          fail: function() {
+            NG.showToast({title: '开始录音失败', icon: 'success'});
+          }
+        })
+    },
+
+    //放下按钮，录音结束
+    endrecord: function(){
+        wx.stopRecord();
+    },
+
+    //播放录音
+    playrecord: function(){
+        var me = this;
+        wx.playVoice({
+          filePath: me.data.temprecordpath.tempFilePath,
+          success: function(res){
+            // success
+          },
+          fail: function() {
+            // fail
+          },
+          complete: function() {
+            // complete
+          }
+        })
+    },
+
+    //删除录音
+    deleterecord: function(){
+        var me = this;
+        me.setData({temprecordpath: ''});
+    },
+
+    //上传语音
+    uploadaudio: function(callback, params){
+        var me =this,
+            serverUrl = getApp().GLOBAL_CONFIG.productAdr + '/rest/api/workflow/TaskInstance/Get?' + params,
+            temprecordpath = me.data.temprecordpath,
+            reSendTime,
+            options;
         
+        if(temprecordpath == ''){ //没有语音直接返回
+            callback && callback(); 
+            return;
+        }
+
+        wx.uploadFile({
+          url: serverUrl,
+          filePath: temprecordpath.tempFilePath,
+          name:'name',
+          // header: {}, // 设置请求的 header
+          // formData: {}, // HTTP 请求中其他额外的 form data
+          success: function(res){
+            // success
+          },
+          fail: function() {
+            // fail
+          },
+          complete: function() {
+            // complete
+          }
+        })
     },
 
     //下级节点选择按钮
@@ -354,6 +435,42 @@ Page({
         })
 
     },
+
+    //单据截图点击
+    screenshottap: function(e){
+        var me  = this,
+            id = e.currentTarget.id,
+            currentData = me.data.formData[id];
+        
+        if(!currentData.isLoadedImg){
+            (function openImage(currentData){
+                var params = {
+                    method: 'GetTaskBizContent',
+                    logid: getApp().GLOBAL_CONFIG.userId,
+                    flowType: me.data.flowType,
+                    piid: me.data.piid
+                };
+                currentData.isLoadedImg = true;
+                NG.AFRequst('TaskInstance', params, function (resp) {
+                    if (resp.status == 'succeed') {
+                        if (resp.type == 'bytes' && resp.data) {
+                            currentData.imgSrc = 'data:image/gif;base64,' + resp.data;
+                            wx.previewImage({ urls: [currentData.imgSrc] });
+                        } else {
+                            currentData.label = '无';
+                        }
+                        me.setData({formData: me.data.formData});
+                    }
+                    else {
+                        currentData.isLoadedImg = false;
+                        NG.showToast({title: '服务接口异常', icon: 'success'});
+                    }
+                });
+            })(currentData);
+        } else {
+            wx.previewImage({ urls: [currentData.imgSrc] });
+        }
+    }, 
 
     ////////////通用事件//////////////
     //tab页选择点击事件
@@ -872,21 +989,6 @@ Page({
                 mainItems.push({
                     label: '单据截图',
                     isScreenshot: true
-                    // TODO: 单据截图事件
-                    // listeners: {
-                    //     initialize: function () {
-                    //         this.element.on({
-                    //             delegate: '.img',
-                    //             tap: function (label, target) {
-                    //                 if (!target.isLoadedImg) {
-                    //                     me.openImage(target);
-                    //                 } else if (target.imgSrc) {
-                    //                     NG.showImage(target, target.imgSrc);
-                    //                 }
-                    //             }
-                    //         });
-                    //     }
-                    // }
                 });
             }
             
@@ -920,8 +1022,6 @@ Page({
                 scope: me
             });
         }
-        
-
     },
 
        /* 获取明细表 */
@@ -1164,5 +1264,7 @@ Page({
             me.setData({
                 toolbars: me.data.toolbars
             });
-    }
+    },
+    
+    
 })

@@ -3,7 +3,8 @@ Page({
     data: {
         stamplist: [], //签章列表
         callbackname: '', //回调方法名称
-        currentstampid: -1 //当前选择的印象id
+        currentstampid: -1, //当前选择的印象id
+        resourceAdr: getApp().GLOBAL_CONFIG.resourceAdr,
     },
 
     onLoad: function(option){
@@ -67,7 +68,7 @@ Page({
         var pages = getCurrentPages(),
             prevpage = pages[pages.length-2];
         
-        prevpage.callbackname(currentstamp.ccode);
+        prevpage.callbackname(currentstamp.ccode, 'data:image/gif;base64,' + currentstamp.content);
 
     },
 

@@ -92,8 +92,6 @@
     padding: 20rpx;
     background-color: #ffffff;
     font-size: 30rpx;
-    
-    
 }
 
 .advicecontanier0 {
@@ -132,6 +130,32 @@
     width: 72rpx;
     height: 72rpx;
     display: block
+}
+
+.radiocontainer {
+    height: 40rpx;
+    width: 590rpx;
+    font-size: 30rpx;
+    line-height: 1.33;
+    background-color: #fcfcfc;
+    position: relative;
+    left: 2rpx;
+    top: -42rpx;
+    border-radius: 0rpx 0rpx 10rpx 10rpx;
+}
+
+.radioimg {
+    height: 40rpx;
+    width: 40rpx;
+    margin-left: 20rpx;
+    float: left;
+}
+
+.radiodelete {
+    color: #79a6c1;
+    text-decoration:underline;
+    float: left;
+    margin-left: 20rpx;
 }
 
 .placeholder {
