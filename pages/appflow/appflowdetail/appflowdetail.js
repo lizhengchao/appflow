@@ -1169,6 +1169,7 @@ Page({
         field.name = name;
         field.id = name;
         field.label = item.FieldDesc;
+        field.hidden = item.ColtrolValue == 2 ? true : false;
         field.value = values.DisplayValue;
         if (item.FieldType == "binary") { // 二进制数据，设置链接点击查看， TODO
             field.xtype = "ngviewtext";
@@ -1195,10 +1196,8 @@ Page({
             field.table = table;
             field.fieldType = item.FieldType;
             field.tableType = tableType;
-            field.inputCls = "x-input-view";
             field.dLen = item.DLen || -99;
-            if (item.ColtrolValue == 0 && item.FieldType != "binary") { // 可编辑
-                field.inputCls = "x-input-edit";
+            if (item.ColtrolValue != 0 && item.FieldType != "binary") { // 可编辑
                 field.readOnly = false;
                 me.data.hasFieldEdit = true; //标识当前表单有可编辑字段
                 field.required = item.ColtrolValue == 3;

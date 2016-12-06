@@ -161,7 +161,7 @@ Page({
           } else {
             //将获取到的cookie塞到localstorge
             //TODO
-            var cookie = 'ASP.NET_SessionId=rr102n45qdoegj45jtrqwv45';
+            var cookie = 'ASP.NET_SessionId=p2omayy2t22qsw45ubbdyamg';
             wx.setStorageSync('Cookie', cookie);
             successcallback({
               loginid: loginid,
