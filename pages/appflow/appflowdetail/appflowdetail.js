@@ -55,6 +55,7 @@ Page({
         signid: '', //签章id
         temprecordpath: '', //录音的临时路径
         recordid: '', //录音上传服务器后返回的id
+        editBizData: '', //表单输入数据
         nodeArray: [], //当前已选择的下级节点
         nodePerson: [] //当前已选择的下级节点办理人,多个节点，每个节点对应对多个办理人
     },
@@ -102,7 +103,6 @@ Page({
 
     },
     onShow: function(){
-
     },
     onHide: function(){
 
@@ -470,7 +470,72 @@ Page({
         } else {
             wx.previewImage({ urls: [currentData.imgSrc] });
         }
-    }, 
+    },
+
+    //文本类型可编辑字段修改事件
+    textfieldinput: function(e){
+        var me = this,
+            id = e.currentTarget.id,
+            formDate = me.data.formData;
+
+        formDate[id].value = e.detail.value;
+        me.setData({
+            formData: formDate
+        })
+    },
+
+    //时间类型可编辑字段修改事件
+    timefieldchange: function(e){
+        var me = this,
+            id = e.currentTarget.id,
+            value =  e.detail.value,
+            type = value.length == 10 ? 'date': 'time',
+            formData = me.data.formData;
+
+        if(type == 'date'){
+            formData[id].datevalue = value;
+        } else {
+            formData[id].timevalue = value;
+        }
+
+        me.setData({
+            formData: formData
+        })
+
+    },
+
+    //详细页文本类型可编辑字段修改事件
+    detailtextfieldinput: function(e){
+        var me = this,
+            id = e.currentTarget.id,
+            ids = id.split(','),
+            formDetailData = me.data.formDetailData[ids[0]].items[ids[1]].items;
+
+        formDetailData[ids[2]].value = e.detail.value;
+        me.setData({
+            formDetailData: me.data.formDetailData
+        })
+    },
+
+    //详细页时间类型可编辑字段修改事件
+    detailtimefieldchange: function(e){
+        var me = this,
+            id = e.currentTarget.id,
+            ids = id.split(','),
+            value =  e.detail.value,
+            type = value.length == 10 ? 'date': 'time',
+            formDetailData = me.data.formDetailData[ids[0]].items[ids[1]].items;
+
+        if(type == 'date'){
+            formDetailData[ids[2]].datevalue = value;
+        } else {
+            formDetailData[ids[2]].timevalue = value;
+        }
+
+        me.setData({
+            formDetailData: me.data.formDetailData
+        })
+    },
 
     ////////////通用事件//////////////
     //tab页选择点击事件
@@ -579,6 +644,10 @@ Page({
         }
         if (designate_node == 1 && nodeArray.length == 0) {
             NG.showToast({ title: "需要指定下级节点", icon: 'success' }); return;
+        }
+
+        if (!me.validFormData()) {
+            return;
         }
 
         if (me.data.needPeople) { //需要指定下级节点办理人
@@ -1100,7 +1169,7 @@ Page({
         if (item.FieldType == "binary") { // 二进制数据，设置链接点击查看， TODO
             field.xtype = "ngviewtext";
             field.value = '<div class="btn-url" style="color: #3993db; text-decoration: underline; width: 100%;line-height: 30px;">查看</div>';
-            if (item.FieldCode == "uploadimage" && Ext.isEmpty(values.DisplayValue)) {
+            if (item.FieldCode == "uploadimage" && util.isEmpty(values.DisplayValue)) {
                 field.value = "";
             }
             field.fieldCode = item.FieldCode;
@@ -1124,7 +1193,7 @@ Page({
             field.tableType = tableType;
             field.inputCls = "x-input-view";
             field.dLen = item.DLen || -99;
-            if (item.ColtrolValue != 0 && item.FieldType != "binary") { // 可编辑
+            if (item.ColtrolValue == 0 && item.FieldType != "binary") { // 可编辑
                 field.inputCls = "x-input-edit";
                 field.readOnly = false;
                 me.data.hasFieldEdit = true; //标识当前表单有可编辑字段
@@ -1139,15 +1208,18 @@ Page({
                     field.xtype = xtypes[item.FieldType];
                 }
                 if (field.xtype == "datefieldux") { //时间控件
-                    field.isNull = true;
-                    field.dateFormat = item.FieldType == "datetime" ? 'Y-m-d H:i' : 'Y-m-d';
-                    field.picker = {
-                        xtype: 'timepickerux',
-                        slotOrder: item.FieldType == "datetime" ? ['year', 'month', 'day', 'hour', 'minute'] : ['year', 'month', 'day']
-                    };
-                    if (values.DisplayValue && values.DisplayValue.length > 0) {
-                        field.value = new Date(values.DisplayValue);
-                        field.isNull = false;
+                    if(item.FieldType == "datetime"){
+                        field.datetype = "datetime";
+                        if (values.DisplayValue && values.DisplayValue.length > 0) {
+                            var date = new Date(values.DisplayValue);
+                            field.datevalue =date .toLocaleDateString();
+                            field.timevalue = (date.getHours() > 9 ? date.getHours() : "0" + date.getHours())
+                                    + ":" + (date.getMinutes() > 9 ? date.getMinutes() : "0" + date.getMinutes());
+                        }
+                    }
+                    else {
+                        field.datetype = "date";
+                        field.datevalue = values.DisplayValue;
                     }
                 } else if (!field.readOnly && me.data.ExpMap[name.replace(/-\d+$/, '')]) {
                     hasKeyUp = true;
@@ -1265,6 +1337,88 @@ Page({
                 toolbars: me.data.toolbars
             });
     },
-    
+
+    /* 验证表单数据信息 */
+    validFormData: function() {
+        var me = this,
+            editBizData = [],
+            bizData = me.data.taskInfo.bizData || [];
+        if (me.data.hasFieldEdit) { //判断当前表单是否有可编辑字段
+            for (var i = 0, bizLen = bizData.length; i < bizLen; i++) {
+                var biz = bizData[i],
+                    field, currValue, matchArr,
+                    tmpBiz = {GroupCode: biz.GroupCode, GroupName: "", Type: biz.Type, FieldSetings: [], DataRows: []},
+                    fields = biz.FieldSetings,
+                    type = biz.Type;
+                for (var k = 0, rowLen = biz.DataRows.length; k < rowLen; k++) {
+                    var fValue = [], tf = false, row = {};
+                    for (var j = 0, fdLen = fields.length; j < fdLen; j++) {
+                        var obj = biz.DataRows[k].FieldValueList[j];
+                        field = fields[j];
+                        if (field.FieldType != "binary" && (field.ColtrolValue == 1 || field.ColtrolValue == 3 || field.ComputeExpr)) { //可编辑
+                            var curritem;
+                            if(type == 0){
+                                curritem = me.data.formData[i];
+                            } else {
+                                curritem = me.data.formDetailData[i-1].items[k].items[j];
+                            }
+                            if(field.FieldType == "datetime"){
+                                currValue = curritem.datevalue + ' '+ curritem.timevalue;
+                            } else if(field.FieldType == "date") {
+                                currValue = curritem.datevalue
+                            } else {
+                                currValue = curritem.value;
+                            }
+
+                            if (currValue === "" && obj.Value === null) {
+                                currValue = null;
+                            }
+                            if (obj.Value != currValue) {
+                                if (util.isEmpty(currValue) && (field.FieldType == "float" || field.FieldType == "int")) {
+                                    currValue = 0;
+                                }
+                                fValue.push({FieldCode: obj.FieldCode, Value: currValue, DisplayValue: obj.DisplayValue, OriginalValue: obj.OriginalValue});
+                                me.data.bizDataHasChanged = true;
+                                tf = true;
+                                if (!me.validDataFormat(currValue, field.FieldType)) {
+                                    NG.alert(field.FieldDesc + " 数据格式错误");
+                                    return false;
+                                }
+                            }
+
+                            if (field.ColtrolValue == 3 && util.isEmpty(currValue)) { //必输判断
+                                NG.alert(field.FieldDesc + " 不能为空");
+                                return false;
+                            }
+                        } else if (field.IsPk) {
+                            fValue.push({FieldCode: obj.FieldCode, Value: obj.Value, DisplayValue: obj.DisplayValue, OriginalValue: obj.OriginalValue});
+                        }
+                    }
+                    if (tf) {
+                        row.RowNum = biz.DataRows[k].RowNum;
+                        row.RowDesc = "";
+                        row.FieldValueList = fValue;
+                        tmpBiz.DataRows.push(row);
+                    }
+                }
+                editBizData.push(tmpBiz);
+            }
+            me.editBizData = editBizData;
+        }
+        return true;
+    },
+
+    //验证数据的格式是否正确
+    validDataFormat: function(value, type) {
+        var regExp = null;
+        if (type == "int") {
+            regExp = /^-?\d+$/;
+        } else if (type == "float") {
+            regExp = /^(-?\d+)(\.\d+)?$/;
+        } else {
+            return true;
+        }
+        return util.isEmpty(value) || regExp.test(value);
+    }
     
 })

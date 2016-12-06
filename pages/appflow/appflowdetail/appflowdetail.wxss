@@ -229,6 +229,11 @@
     border: 2rpx solid #ebebeb
 }
 
+.datefield {
+    float: left;
+    padding-right: 20rpx;
+}
+
 .screenshotimg1 {
     height: 80rpx;
     width: 80rpx;

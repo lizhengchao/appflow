@@ -54,7 +54,12 @@ function AFRequst(funcname, params, callback) {
     })
 }
 
+function alert(message){
+    showToast({title: message, icon: 'success'});
+}
+
 module.exports = {
   showToast: showToast,
-  AFRequst: AFRequst
+  AFRequst: AFRequst,
+    alert: alert
 }

@@ -39,10 +39,20 @@ function arrayToString(arr){
   } else {
     throw new error('参数必须为数组');
   }
-}
+};
+
+ function isEmpty(value, allowEmptyString) {
+    return (value === null) || (value === undefined) || (!allowEmptyString ? value === '' : false) || (isArray(value) && value.length === 0);
+};
+
+function isArray(value) {
+    return toString.call(value) === '[object Array]';
+};
 
 module.exports = {
-  formatTime: formatTime,
-  parseParam: parseParam,
-  arrayToString: arrayToString
+    formatTime: formatTime,
+    parseParam: parseParam,
+    arrayToString: arrayToString,
+    isEmpty: isEmpty,
+    isArray: isArray
 }
