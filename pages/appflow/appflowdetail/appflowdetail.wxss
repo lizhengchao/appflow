@@ -224,6 +224,11 @@
     float: left;
 }
 
+.formeditablerowname {
+    color: #509fdf;
+    border: 2rpx solid #ebebeb
+}
+
 .screenshotimg1 {
     height: 80rpx;
     width: 80rpx;

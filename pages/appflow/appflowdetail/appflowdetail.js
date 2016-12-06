@@ -988,7 +988,7 @@ Page({
             } else {
                 mainItems.push({
                     label: '单据截图',
-                    isScreenshot: true
+                    xtype: 'screenshot'
                 });
             }
             

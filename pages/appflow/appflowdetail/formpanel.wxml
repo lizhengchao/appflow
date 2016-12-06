@@ -8,14 +8,20 @@
 </block>
 
 <block wx:for="{{formData}}">
-    <block wx:if="{{!item.isScreenshot}}">
+    <block wx:if="{{item.xtype == 'ngviewtext'}}">
         <view class="formrow">
             <view class="formrowtitle">{{item.label}}</view>
             <view class="formrowname">{{item.value}}</view>
             <view class="clear"></view>
         </view>
     </block>
-    <block wx:if="{{item.isScreenshot}}">
+    <block wx:if="{{item.xtype == 'textfield'}}">
+        <view class="formrow">
+            <view class="formrowtitle">{{item.label}}</view>
+            <input value="{{item.value}}" class="formeditablerowname"></input>
+        </view>
+    </block>
+    <block wx:if="{{item.xtype == 'screenshot'}}">
         <view class="formrow">
             <block wx:if="{{item.label == '单据截图'}}">
                 <view class="formrowtitle">单据截图</view>
@@ -39,7 +45,7 @@
     <block wx:for="{{item0.items}}" wx:for-index="index1" wx:for-item="item1">
         <view class="formrow">
             <view class="formrowname">{{item1.title}}</view>
-            <image src="../../../resource/image/{{item1.display==1?'down.png':'up.png'}}" 
+            <image src="{{resourceAdr}}/{{item1.display==1?'down.png':'up.png'}}" 
                 id="{{index0+','+index1}}" class="detailtapimage" bindtap="detailtap"></image>
         </view>
         <view style="display: {{item1.display==1?'display':'none'}}">
