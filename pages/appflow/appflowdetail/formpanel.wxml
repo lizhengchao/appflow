@@ -55,13 +55,13 @@
     <block wx:for="{{item0.items}}" wx:for-index="index1" wx:for-item="item1">
         <view class="formrow">
             <view class="formrowname">{{item1.title}}</view>
-            <image src="{{resourceAdr}}/{{item1.display==1?'down.png':'up.png'}}" 
+            <image src="{{resourceAdr}}/{{item1.display==1?'up.png':'down.png'}}" 
                 id="{{index0+','+index1}}" class="detailtapimage" bindtap="detailtap"></image>
         </view>
         <view style="display: {{item1.display==1?'display':'none'}}">
             <block wx:for="{{item1.items}}" wx:for-index="index2" wx:for-item="item2">
                 <block wx:if="{{!item2.hidden}}">
-                    <block wx:if="{{item2.xtype == 'ngviewtext'}}">
+                    <block wx:if="{{item2.xtype == 'ngviewtext' || (item2.xtype == 'textfield' && item2.readOnly)}}">
                         <view class="formrow">
                             <view class="formrowtitle">{{item2.label}}</view>
                             <view class="formrowname">{{item2.value}}</view>
@@ -86,4 +86,5 @@
             </block>
         </view>
     </block>
+    <view class="intervalrow"></view>
 </block>

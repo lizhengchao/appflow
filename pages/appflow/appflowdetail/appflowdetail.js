@@ -1107,18 +1107,7 @@ Page({
             var row = detailBiz.DataRows[rowIndex];
             var container = {
                     title: row.RowDesc,
-                    xtype: 'container',
-                    name: detailBiz.GroupCode + "-" + row.RowNum,
-                    spacing: 0,
-                    padding: '6 0 6 10',
-                    hidden: true,
-                    cls: 'noAfter',
-                    defaults: {
-                        labelWidth: 80,
-                        cls: 'edit-input',
-                        clearIcon: false,
-                        labelWrap: true
-                    }
+                    name: detailBiz.GroupCode + "-" + row.RowNum
                 },
             fields = [];
             for(var index in detailBiz.FieldSetings){
@@ -1204,7 +1193,6 @@ Page({
                 if (item.HelpString) { // 需要调用通用帮助
                     field.xtype = "ngcommonhelp";
                     field.readOnly = true;
-                    field.cls = "edit-input edit-select";
                     field.helper = {title: item.FieldDesc, helpString: item.HelpString};
                     field.fromValues = values;
                 } else {
@@ -1302,45 +1290,6 @@ Page({
         });
     },
 
-    //初始化下方操作栏
-    initToolbar: function(){
-        var me = this,
-            taskInfo = me.data.taskInfo.taskInstInfo[0];
-            me.data.toolbars.push({
-                name: '提交',
-                tapfunction: 'submitbtnTap'
-            });
-            if (taskInfo.canUndo != 0) {
-                me.data.toolbars.push({
-                    name: '驳回',
-                    tapfunction: 'rejectbtnTap'});
-            }
-            if (taskInfo.canTransmit && taskInfo.canTransmit == 1) {
-                me.data.toolbars.push({
-                    name: '转签',
-                    tapfunction: 'changebtnTap'});
-            }
-            if (taskInfo.canTermi == 1) {
-                 me.data.toolbars.push({
-                    name: '终止',
-                    tapfunction: 'stopbtnTap'});
-            }
-            if (taskInfo.canAddTis == 1) {
-                me.data.toolbars.push({
-                    name: '加签',
-                    tapfunction: 'addbtnTap'});
-            }
-            if (me.data.toolbars.length > 3) {
-                me.data.toolbars.splice(2, 0, {
-                    name: '更多',
-                    tapfunction: 'morebtnTap'
-                });
-            }
-            me.setData({
-                toolbars: me.data.toolbars
-            });
-    },
-
     /* 验证表单数据信息 */
     validFormData: function() {
         var me = this,
@@ -1422,6 +1371,102 @@ Page({
             return true;
         }
         return util.isEmpty(value) || regExp.test(value);
+    },
+
+    //当表单字段的值变化时发生
+    onFieldKeyUp: function(node, table, fieldType) {
+        if (node.name) {
+            var me = this,
+                key = node.name.replace(/-\d+$/, ''),
+                map = me.ExpMap[key],
+                expIndex,
+                newNode,
+                oldValue,
+                newValue,
+                dLen = null,
+                tmpCmp;
+            me.calcExpDirs.push(key);
+            for (var i = 0, len = map ? map.length : 0; i < len; i++) {
+                if (me.calcExpDirs.indexOf(map[i]) > -1) {
+                    continue;
+                }
+                expIndex = node.name.match(/\d+$/)[0];
+                tmpCmp = Ext.getCmp(map[i] + "-" + expIndex) || Ext.getCmp(map[i] + "-0");
+                if (tmpCmp && tmpCmp.config.expr) {
+                    if (tmpCmp.config.tableType == 1 && tmpCmp.config.table != table) { //更新明细表
+                        expIndex = 0;
+                        tmpCmp = Ext.getCmp(map[i] + "-" + expIndex);
+                        while (tmpCmp && tmpCmp.config.expr) {
+                            oldValue = tmpCmp.getValue();
+                            if (tmpCmp.config.fieldType == "int") {
+                                dLen = 0;
+                            } else {
+                                dLen = tmpCmp.config.dLen > 0 ? tmpCmp.config.dLen : null;
+                            }
+                            newValue = me.calcExp(tmpCmp.config.expr, expIndex, dLen, fieldType);
+                            if (oldValue != newValue) { //防止不必要的更新
+                                tmpCmp.setValue(newValue);
+                                newNode = tmpCmp.element.query("input.x-input-el")[0];
+                                newNode && me.onFieldKeyUp(newNode, tmpCmp.config.table, tmpCmp.config.fieldType);
+                            }
+                            expIndex++;
+                            tmpCmp = Ext.getCmp(map[i] + "-" + expIndex);
+                        }
+                    } else {
+                        oldValue = tmpCmp.getValue();
+                        if (tmpCmp.config.fieldType == "int") {
+                            dLen = 0;
+                        } else {
+                            dLen = tmpCmp.config.dLen > 0 ? tmpCmp.config.dLen : null;
+                        }
+                        newValue = me.calcExp(tmpCmp.config.expr, expIndex, dLen, fieldType);
+                        if (oldValue != newValue) {
+                            tmpCmp.setValue(newValue);
+                            newNode = tmpCmp.element.query("input.x-input-el")[0];
+                            newNode && me.onFieldKeyUp(newNode, tmpCmp.config.table, tmpCmp.config.fieldType);
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    //初始化下方操作栏
+    initToolbar: function(){
+        var me = this,
+            taskInfo = me.data.taskInfo.taskInstInfo[0];
+        me.data.toolbars.push({
+            name: '提交',
+            tapfunction: 'submitbtnTap'
+        });
+        if (taskInfo.canUndo != 0) {
+            me.data.toolbars.push({
+                name: '驳回',
+                tapfunction: 'rejectbtnTap'});
+        }
+        if (taskInfo.canTransmit && taskInfo.canTransmit == 1) {
+            me.data.toolbars.push({
+                name: '转签',
+                tapfunction: 'changebtnTap'});
+        }
+        if (taskInfo.canTermi == 1) {
+            me.data.toolbars.push({
+                name: '终止',
+                tapfunction: 'stopbtnTap'});
+        }
+        if (taskInfo.canAddTis == 1) {
+            me.data.toolbars.push({
+                name: '加签',
+                tapfunction: 'addbtnTap'});
+        }
+        if (me.data.toolbars.length > 3) {
+            me.data.toolbars.splice(2, 0, {
+                name: '更多',
+                tapfunction: 'morebtnTap'
+            });
+        }
+        me.setData({
+            toolbars: me.data.toolbars
+        });
     }
-    
 })
