@@ -592,6 +592,10 @@ Page({
             NG.showToast({ title: "需要签章，请选择签章", icon: 'success' }); return;
         }
 
+        if (!me.validFormData()) {
+            return;
+        }
+
         var params = {
                 method: 'GetRollBackInfo',
                 flowType: me.data.flowType,
@@ -646,10 +650,6 @@ Page({
             NG.showToast({ title: "需要指定下级节点", icon: 'success' }); return;
         }
 
-        if (!me.validFormData()) {
-            return;
-        }
-
         if (me.data.needPeople) { //需要指定下级节点办理人
             for(var i=0; i<nodeArray.length; i++){
                 var node = nodeArray[i];
@@ -662,6 +662,10 @@ Page({
                     };
                 }
             };
+        }
+
+        if (!me.validFormData()) {
+            return;
         }
 
         NG.showToast({title: "正在提交", icon: 'success' });
@@ -696,28 +700,32 @@ Page({
             content: '确定终止该流程',
             success: function(res){
                 if(res.confirm){
-                NG.showToast({title: '正在终止', icon: 'success'});
+                    NG.showToast({title: '正在终止', icon: 'success'});
 
-                var parms = {
-                    method: 'Terminate',
-                    logid: getApp().GLOBAL_CONFIG.userId,
-                    flowType: me.data.flowType,
-                    piid: me.data.piid,
-                    nodeid: me.data.nodeid,
-                    taskinstid: me.data.taskinstid,
-                    remark: me.data.comments,
-                    bizdata: '[]',
-                    audioremark: ''
-                };
+                    var parms = {
+                        method: 'Terminate',
+                        logid: getApp().GLOBAL_CONFIG.userId,
+                        flowType: me.data.flowType,
+                        piid: me.data.piid,
+                        nodeid: me.data.nodeid,
+                        taskinstid: me.data.taskinstid,
+                        remark: me.data.comments,
+                        bizdata: '[]',
+                        audioremark: ''
+                    };
 
-                NG.AFRequst('TaskInstance', parms, function (resp) {
-                    if (resp.status == 'succeed') {
-                        wx.navigateBack({ delta: 1 });
+                    if (!me.validFormData()) {
+                        return;
                     }
-                    else {
-                        NG.showToast({title: '终止失败：' + resp.errmsg, icon: 'success'});
-                    }
-                });
+
+                    NG.AFRequst('TaskInstance', parms, function (resp) {
+                        if (resp.status == 'succeed') {
+                            wx.navigateBack({ delta: 1 });
+                        }
+                        else {
+                            NG.showToast({title: '终止失败：' + resp.errmsg, icon: 'success'});
+                        }
+                    });
                 }
             }
         })
@@ -1039,11 +1047,9 @@ Page({
                 d_Idx = 1;
                 for(var i in mainBiz.FieldSetings){
                     var item = mainBiz.FieldSetings[i];
-                    if (item.ColtrolValue != 2) { //隐藏不需要显示
                         var defaultValue = mainBiz.DataRows.length > 0 ? 
                             mainBiz.DataRows[0].FieldValueList[i] : {FieldCode: item.FieldCode, Value: "", DisplayValue: "", OriginalValue: ""};
                         mainItems.push(me.getEditField(item, defaultValue, mainBiz.GroupCode + "-" + item.FieldCode + "-0", mainBiz.Type, mainBiz.GroupCode));
-                    }
                 };
             }
             if (flowType == "oawf") {
@@ -1116,10 +1122,8 @@ Page({
                 },
             fields = [];
             for(var index in detailBiz.FieldSetings){
-                    var item = detailBiz.FieldSetings[index];
-                if (item.ColtrolValue != 2) { //隐藏不需要显示
-                    fields.push(me.getEditField(item, row.FieldValueList[index], detailBiz.GroupCode + "-" + item.FieldCode + "-" + row.RowNum, detailBiz.Type, detailBiz.GroupCode));
-                }
+                var item = detailBiz.FieldSetings[index];
+                fields.push(me.getEditField(item, row.FieldValueList[index], detailBiz.GroupCode + "-" + item.FieldCode + "-" + row.RowNum, detailBiz.Type, detailBiz.GroupCode));
             };
             container.items = fields;
             items.push(container);
@@ -1358,7 +1362,7 @@ Page({
                         if (field.FieldType != "binary" && (field.ColtrolValue == 1 || field.ColtrolValue == 3 || field.ComputeExpr)) { //可编辑
                             var curritem;
                             if(type == 0){
-                                curritem = me.data.formData[i];
+                                curritem = me.data.formData[j];
                             } else {
                                 curritem = me.data.formDetailData[i-1].items[k].items[j];
                             }

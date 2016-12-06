@@ -8,39 +8,41 @@
 </block>
 
 <block wx:for="{{formData}}">
-    <block wx:if="{{item.xtype == 'ngviewtext'}}">
-        <view class="formrow">
-            <view class="formrowtitle">{{item.label}}</view>
-            <view class="formrowname">{{item.value}}</view>
-            <view class="clear"></view>
-        </view>
-    </block>
-    <block wx:if="{{item.xtype == 'textfield' && !item.readOnly}}">
-        <view class="formrow">
-            <view class="formrowtitle">{{item.label}}</view>
-            <input value="{{item.value}}" class="formeditablerowname" id="{{index}}" bindinput="textfieldinput"></input>
-        </view>
-    </block>
-    <block wx:if="{{item.xtype == 'datefieldux' && !item.readOnly}}">
-        <view class="formrow">
-            <view class="formrowtitle">{{item.label}}</view>
-                <picker mode="date" value="{{item.datevalue}}" class="datefield formeditablerowname" id="{{index}}" bindchange="timefieldchange">{{item.datevalue}}</picker>
-                <picker mode="time" value="{{item.timevalue}}" class="datefield formeditablerowname" id="{{index}}" bindchange="timefieldchange">{{item.timevalue}}</picker>
+    <block wx:if="{{item.ColtrolValue != 2}}">
+        <block wx:if="{{item.xtype == 'ngviewtext'}}">
+            <view class="formrow">
+                <view class="formrowtitle">{{item.label}}</view>
+                <view class="formrowname">{{item.value}}</view>
                 <view class="clear"></view>
-        </view>
-    </block>
-    <block wx:if="{{item.xtype == 'screenshot'}}">
-        <view class="formrow">
-            <block wx:if="{{item.label == '单据截图'}}">
-                <view class="formrowtitle">单据截图</view>
-                <image src='{{resourceAdr}}/form.png' class="screenshotimg1"></image>
-                <image src='{{resourceAdr}}/search_y.png' class="screenshotimg2" id="{{index}}" bindtap="screenshottap"></image>
-            </block>
-            <block wx:if="{{item.label == '无'}}">
-                <view class="formrowtitle">单据截图</view>
-                <view>无</view>
-            </block>
-        </view>
+            </view>
+        </block>
+        <block wx:if="{{item.xtype == 'textfield' && !item.readOnly}}">
+            <view class="formrow">
+                <view class="formrowtitle">{{item.label}}</view>
+                <input value="{{item.value}}" class="formeditablerowname" id="{{index}}" bindinput="textfieldinput"></input>
+            </view>
+        </block>
+        <block wx:if="{{item.xtype == 'datefieldux' && !item.readOnly}}">
+            <view class="formrow">
+                <view class="formrowtitle">{{item.label}}</view>
+                    <picker mode="date" value="{{item.datevalue}}" class="datefield formeditablerowname" id="{{index}}" bindchange="timefieldchange">{{item.datevalue}}</picker>
+                    <picker mode="time" value="{{item.timevalue}}" class="datefield formeditablerowname" id="{{index}}" bindchange="timefieldchange">{{item.timevalue}}</picker>
+                    <view class="clear"></view>
+            </view>
+        </block>
+        <block wx:if="{{item.xtype == 'screenshot'}}">
+            <view class="formrow">
+                <block wx:if="{{item.label == '单据截图'}}">
+                    <view class="formrowtitle">单据截图</view>
+                    <image src='{{resourceAdr}}/form.png' class="screenshotimg1"></image>
+                    <image src='{{resourceAdr}}/search_y.png' class="screenshotimg2" id="{{index}}" bindtap="screenshottap"></image>
+                </block>
+                <block wx:if="{{item.label == '无'}}">
+                    <view class="formrowtitle">单据截图</view>
+                    <view>无</view>
+                </block>
+            </view>
+        </block>
     </block>
 </block>
 
@@ -58,26 +60,28 @@
         </view>
         <view style="display: {{item1.display==1?'display':'none'}}">
             <block wx:for="{{item1.items}}" wx:for-index="index2" wx:for-item="item2">
-                <block wx:if="{{item2.xtype == 'ngviewtext'}}">
-                    <view class="formrow">
-                        <view class="formrowtitle">{{item2.label}}</view>
-                        <view class="formrowname">{{item2.value}}</view>
-                        <view class="clear"></view>
-                    </view>
-                </block>
-                <block wx:if="{{item2.xtype == 'textfield' && !item2.readOnly}}">
-                    <view class="formrow">
-                        <view class="formrowtitle">{{item2.label}}</view>
-                        <input value="{{item2.value}}" class="formeditablerowname" id="{{index0+','+index1+','+index2}}" bindinput="detailtextfieldinput"></input>
-                    </view>
-                </block>
-                <block wx:if="{{item2.xtype == 'datefieldux' && !item2.readOnly}}">
-                    <view class="formrow">
-                        <view class="formrowtitle">{{item2.label}}</view>
-                            <picker mode="date" value="{{item2.datevalue}}" class="datefield formeditablerowname" id="{{index0+','+index1+','+index2}}" bindchange="detailtimefieldchange">{{item2.datevalue}}</picker>
-                            <picker mode="time" value="{{item2.timevalue}}" class="datefield formeditablerowname" id="{{index0+','+index1+','+index2}}" bindchange="detailtimefieldchange">{{item2.timevalue}}</picker>
+                <block wx:if="{{item2.ColtrolValue != 2}}">
+                    <block wx:if="{{item2.xtype == 'ngviewtext'}}">
+                        <view class="formrow">
+                            <view class="formrowtitle">{{item2.label}}</view>
+                            <view class="formrowname">{{item2.value}}</view>
                             <view class="clear"></view>
-                    </view>
+                        </view>
+                    </block>
+                    <block wx:if="{{item2.xtype == 'textfield' && !item2.readOnly}}">
+                        <view class="formrow">
+                            <view class="formrowtitle">{{item2.label}}</view>
+                            <input value="{{item2.value}}" class="formeditablerowname" id="{{index0+','+index1+','+index2}}" bindinput="detailtextfieldinput"></input>
+                        </view>
+                    </block>
+                    <block wx:if="{{item2.xtype == 'datefieldux' && !item2.readOnly}}">
+                        <view class="formrow">
+                            <view class="formrowtitle">{{item2.label}}</view>
+                                <picker mode="date" value="{{item2.datevalue}}" class="datefield formeditablerowname" id="{{index0+','+index1+','+index2}}" bindchange="detailtimefieldchange">{{item2.datevalue}}</picker>
+                                <picker mode="time" value="{{item2.timevalue}}" class="datefield formeditablerowname" id="{{index0+','+index1+','+index2}}" bindchange="detailtimefieldchange">{{item2.timevalue}}</picker>
+                                <view class="clear"></view>
+                        </view>
+                    </block>
                 </block>
             </block>
         </view>
