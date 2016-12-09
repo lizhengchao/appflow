@@ -58,8 +58,23 @@ function alert(message){
     showToast({title: message, icon: 'success'});
 }
 
+function sysLog(msg, logType, stacktrace){
+    console.log(msg);
+}
+
+var LogType = {
+    SYSTEM: "0",   //系统信息
+        LOGIN: '1',       //登录日志
+        JS: "2",             //js日志
+        NATIVE: "3",   //native日志
+        OPERATION: "4", //操作信息
+        FEEDBACK: "5"   //意见反馈
+}
+
 module.exports = {
-  showToast: showToast,
-  AFRequst: AFRequst,
-    alert: alert
+    showToast: showToast,
+    AFRequst: AFRequst,
+    alert: alert,
+    sysLog: sysLog,
+    LogType: LogType
 }

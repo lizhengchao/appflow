@@ -19,14 +19,14 @@
         <block wx:if="{{item.xtype == 'textfield' && !item.readOnly}}">
             <view class="formrow">
                 <view class="formrowtitle">{{item.label}}</view>
-                <input value="{{item.value}}" class="formeditablerowname" id="{{index}}" bindinput="textfieldinput"></input>
+                <input value="{{item.value}}" class="formeditablerowname" id="{{index}}" bindinput="{{item.hasEvent ? 'textfieldinput' : ''}}"></input>
             </view>
         </block>
         <block wx:if="{{item.xtype == 'datefieldux' && !item.readOnly}}">
             <view class="formrow">
                 <view class="formrowtitle">{{item.label}}</view>
-                    <picker mode="date" value="{{item.datevalue}}" class="datefield formeditablerowname" id="{{index}}" bindchange="timefieldchange">{{item.datevalue}}</picker>
-                    <picker mode="time" value="{{item.timevalue}}" class="datefield formeditablerowname" id="{{index}}" bindchange="timefieldchange">{{item.timevalue}}</picker>
+                    <picker mode="date" value="{{item.datevalue}}" class="datefield formeditablerowname" id="{{index}}" bindchange="{{item.hasEvent ? 'timefieldchange' : ''}}">{{item.datevalue}}</picker>
+                    <picker mode="time" value="{{item.timevalue}}" class="datefield formeditablerowname" id="{{index}}" bindchange="{{item.hasEvent ? 'timefieldchange' : ''}}">{{item.timevalue}}</picker>
                     <view class="clear"></view>
             </view>
         </block>
@@ -71,14 +71,14 @@
                     <block wx:if="{{item2.xtype == 'textfield' && !item2.readOnly}}">
                         <view class="formrow">
                             <view class="formrowtitle">{{item2.label}}</view>
-                            <input value="{{item2.value}}" class="formeditablerowname" id="{{index0+','+index1+','+index2}}" bindinput="detailtextfieldinput"></input>
+                            <input value="{{item2.value}}" class="formeditablerowname" id="{{index0+','+index1+','+index2}}" bindinput="{{item2.hasEvent ? 'detailtextfieldinput' : ''}}"></input>
                         </view>
                     </block>
                     <block wx:if="{{item2.xtype == 'datefieldux' && !item2.readOnly}}">
                         <view class="formrow">
                             <view class="formrowtitle">{{item2.label}}</view>
-                                <picker mode="date" value="{{item2.datevalue}}" class="datefield formeditablerowname" id="{{index0+','+index1+','+index2}}" bindchange="detailtimefieldchange">{{item2.datevalue}}</picker>
-                                <picker mode="time" value="{{item2.timevalue}}" class="datefield formeditablerowname" id="{{index0+','+index1+','+index2}}" bindchange="detailtimefieldchange">{{item2.timevalue}}</picker>
+                                <picker mode="date" value="{{item2.datevalue}}" class="datefield formeditablerowname" id="{{index0+','+index1+','+index2}}" bindchange="{{item2.hasEvent ? 'detailtimefieldchange' : ''}}">{{item2.datevalue}}</picker>
+                                <picker mode="time" value="{{item2.timevalue}}" class="datefield formeditablerowname" id="{{index0+','+index1+','+index2}}" bindchange="{{item2.hasEvent ? 'detailtimefieldchange' : ''}}">{{item2.timevalue}}</picker>
                                 <view class="clear"></view>
                         </view>
                     </block>

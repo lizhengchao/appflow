@@ -482,6 +482,24 @@ Page({
         me.setData({
             formData: formDate
         })
+
+        var
+            currV = "",
+            target = e.delegatedTarget || e.target,
+            match;
+        if (target.tagName == "INPUT") {
+            if (fd.config.fieldType == "int") {
+                currV = target.value.replace(/[^\d]/g, '');
+            } else {
+                match = target.value.match(/\d+[\.]?(\d+)?/);
+                currV = match ? match[0] : '';
+            }
+            if (target.value != currV) {
+                target.value = currV;
+            }
+            me.data.calcExpDirs = []; //清空计算路径
+            //TODO:     me.onFieldKeyUp(e.delegatedTarget, fd.config.table, fd.config.fieldType);
+        }
     },
 
     //时间类型可编辑字段修改事件
@@ -508,13 +526,27 @@ Page({
     detailtextfieldinput: function(e){
         var me = this,
             id = e.currentTarget.id,
+            value = e.detail.value,
             ids = id.split(','),
-            formDetailData = me.data.formDetailData[ids[0]].items[ids[1]].items;
+            formDetailData = me.data.formDetailData[ids[0]].items[ids[1]].items[ids[2]],
+            currV = "",
+            match;
 
-        formDetailData[ids[2]].value = e.detail.value;
+        if (util.isInteger(value)) {
+            currV = value.replace(/[^\d]/g, '');
+        } else {
+            match = value.match(/\d+[\.]?(\d+)?/);
+            currV = match ? match[0] : '';
+        }
+        formDetailData.value = currV;
         me.setData({
             formDetailData: me.data.formDetailData
         })
+        me.data.calcExpDirs = []; //清空计算路径
+        me.onFieldKeyUp(formDetailData.name, formDetailData.table, formDetailData.fieldType);
+        if (value != currV) {
+            return currV;
+        }
     },
 
     //详细页时间类型可编辑字段修改事件
@@ -1214,36 +1246,38 @@ Page({
                     }
                 } else if (!field.readOnly && me.data.ExpMap[name.replace(/-\d+$/, '')]) {
                     hasKeyUp = true;
-                    field.listeners = {
-                        initialize: function (fd) {
-                            fd.on({
-                                keyup: function (c, e) {
-                                    var evt = e.browserEvent || e.event,
-                                        currV = "",
-                                        target = e.delegatedTarget || e.target,
-                                        match;
-                                    if (evt.keyCode == 37 || evt.keyCode == 39) { //光标左右移动
-                                        return;
-                                    }
-                                    if (target.tagName == "INPUT") {
-                                        if (fd.config.fieldType == "int") {
-                                            currV = target.value.replace(/[^\d]/g, '');
-                                        } else {
-                                            match = target.value.match(/\d+[\.]?(\d+)?/);
-                                            currV = match ? match[0] : '';
-                                        }
-                                        if (target.value != currV) {
-                                            target.value = currV;
-                                        }
-                                        me.data.calcExpDirs = []; //清空计算路径
-                                   //TODO:     me.onFieldKeyUp(e.delegatedTarget, fd.config.table, fd.config.fieldType);
-                                    }
-                                }
-                            });
-                        }
-                    };
+                    field.hasEvent = true;
+//                    field.listeners = {
+//                        initialize: function (fd) {
+//                            fd.on({
+//                                keyup: function (c, e) {
+//                                    var evt = e.browserEvent || e.event,
+//                                        currV = "",
+//                                        target = e.delegatedTarget || e.target,
+//                                        match;
+//                                    if (evt.keyCode == 37 || evt.keyCode == 39) { //光标左右移动
+//                                        return;
+//                                    }
+//                                    if (target.tagName == "INPUT") {
+//                                        if (fd.config.fieldType == "int") {
+//                                            currV = target.value.replace(/[^\d]/g, '');
+//                                        } else {
+//                                            match = target.value.match(/\d+[\.]?(\d+)?/);
+//                                            currV = match ? match[0] : '';
+//                                        }
+//                                        if (target.value != currV) {
+//                                            target.value = currV;
+//                                        }
+//                                        me.data.calcExpDirs = []; //清空计算路径
+//                                   //TODO:     me.onFieldKeyUp(e.delegatedTarget, fd.config.table, fd.config.fieldType);
+//                                    }
+//                                }
+//                            });
+//                        }
+//                    };
                 }
                 if(!hasKeyUp && me.data.ExpMap[name.replace(/-\d+$/, '')]) {
+                    field.hasEvent = true;
                     field.listeners = {
                         initialize: function (fd) {
                             fd.on({
@@ -1374,61 +1408,251 @@ Page({
     },
 
     //当表单字段的值变化时发生
-    onFieldKeyUp: function(node, table, fieldType) {
-        if (node.name) {
+    onFieldKeyUp: function(name, table, fieldType, formDetailData) {
+        if (name) {
             var me = this,
-                key = node.name.replace(/-\d+$/, ''),
-                map = me.ExpMap[key],
+                key = name.replace(/-\d+$/, ''),
+                map = me.data.ExpMap[key],
                 expIndex,
-                newNode,
                 oldValue,
                 newValue,
                 dLen = null,
-                tmpCmp;
-            me.calcExpDirs.push(key);
+                tmpitem;
+            me.data.calcExpDirs.push(key);
             for (var i = 0, len = map ? map.length : 0; i < len; i++) {
-                if (me.calcExpDirs.indexOf(map[i]) > -1) {
+                if (me.data.calcExpDirs.indexOf(map[i]) > -1) {
                     continue;
                 }
-                expIndex = node.name.match(/\d+$/)[0];
-                tmpCmp = Ext.getCmp(map[i] + "-" + expIndex) || Ext.getCmp(map[i] + "-0");
-                if (tmpCmp && tmpCmp.config.expr) {
-                    if (tmpCmp.config.tableType == 1 && tmpCmp.config.table != table) { //更新明细表
+                expIndex = name.match(/\d+$/)[0];
+                tmpitem = me.getFormDataByName(map[i] + "-" + expIndex) || me.getFormDataByName(map[i] + "-0");
+                if (tmpitem.expr) {
+                    if (tmpitem.tableType == 1 && tmpitem.table != table) { //更新明细表
                         expIndex = 0;
-                        tmpCmp = Ext.getCmp(map[i] + "-" + expIndex);
-                        while (tmpCmp && tmpCmp.config.expr) {
-                            oldValue = tmpCmp.getValue();
-                            if (tmpCmp.config.fieldType == "int") {
-                                dLen = 0;
-                            } else {
-                                dLen = tmpCmp.config.dLen > 0 ? tmpCmp.config.dLen : null;
-                            }
-                            newValue = me.calcExp(tmpCmp.config.expr, expIndex, dLen, fieldType);
-                            if (oldValue != newValue) { //防止不必要的更新
-                                tmpCmp.setValue(newValue);
-                                newNode = tmpCmp.element.query("input.x-input-el")[0];
-                                newNode && me.onFieldKeyUp(newNode, tmpCmp.config.table, tmpCmp.config.fieldType);
-                            }
-                            expIndex++;
-                            tmpCmp = Ext.getCmp(map[i] + "-" + expIndex);
-                        }
-                    } else {
-                        oldValue = tmpCmp.getValue();
-                        if (tmpCmp.config.fieldType == "int") {
+                        oldValue = tmpitem.value;
+                        if (tmpitem.fieldType == "int") {
                             dLen = 0;
                         } else {
-                            dLen = tmpCmp.config.dLen > 0 ? tmpCmp.config.dLen : null;
+                            dLen =tmpitem.dLen > 0 ? tmpitem.dLen : null;
                         }
-                        newValue = me.calcExp(tmpCmp.config.expr, expIndex, dLen, fieldType);
+                        newValue = me.calcExp(tmpitem.expr, expIndex, dLen, fieldType);
                         if (oldValue != newValue) {
-                            tmpCmp.setValue(newValue);
-                            newNode = tmpCmp.element.query("input.x-input-el")[0];
-                            newNode && me.onFieldKeyUp(newNode, tmpCmp.config.table, tmpCmp.config.fieldType);
+                            tmpitem.value = newValue;
+                            me.onFieldKeyUp(tmpitem.name, tmpitem.table, tmpitem.fieldType);
+                        }
+                        expIndex++;
+                    } else {
+                        oldValue = tmpitem.value;
+                        if (tmpitem.fieldType == "int") {
+                            dLen = 0;
+                        } else {
+                            dLen = tmpitem.dLen > 0 ? tmpitem.dLen : null;
+                        }
+                        newValue = me.calcExp(tmpitem.expr, expIndex, dLen, fieldType);
+                        if (oldValue != newValue) {
+                            tmpitem.value = newValue;
+                            me.onFieldKeyUp(tmpitem.name, tmpitem.table, tmpitem.fieldType);
                         }
                     }
                 }
             }
+            me.setData({
+                formData: me.data.formData,
+                formDetailData: me.data.formDetailData
+            })
         }
+    },
+
+    //获取对应名字的表单
+    getFormDataByName: function(name){
+        var me = this,
+            formData = me.data.formData,
+            formDetailData = me.data.formDetailData,
+            i, j ,k;
+
+        for(i = 0; i<formData.length; i++){
+            if(formData[i].name && formData[i].name === name){
+                return formData[i];
+            }
+        }
+
+        for(i = 0; i<formDetailData.length; i++){
+            for(j = 0; j<formDetailData[i].items.length; j++){
+                for(k = 0; k<formDetailData[i].items[j].items.length; k++){
+                    if(formDetailData[i].items[j].items[k].name && formDetailData[i].items[j].items[k].name === name){
+                        return formDetailData[i].items[j].items[k];
+                    }
+                }
+            }
+        }
+    },
+
+    //表达式计算
+    calcExp: function(expStr, expIndex, dLen, fType) {
+        var me = this,
+            rowIndex = 0,
+            bizData = me.data.taskInfo.bizData, //字段属性为隐藏时，控件的值无法找到，需要通过getHideFieldValue方法来检索数据，
+            isString = fType === 'string' || fType === 'datetime' || fType === 'date';
+        var AVG = function () {
+                if (rowIndex > 0) {
+                    return SUM(arguments[0]) / rowIndex;
+                } else {
+                    return 0;
+                }
+            },
+            SUM = function () {
+                var arg = arguments[0],
+                    result = 0,
+                    cal,
+                    find = false,
+                    matchArray = arg.match(/\{([^\{\}]+)\}/g),
+                    Values = {},
+                    field, go = true;
+                rowIndex = 0;
+                while (matchArray && go) {
+                    cal = arg;
+                    find = false;
+                    for (var i = 0, len = matchArray.length; i < len; i++) {
+                        field = me.getFormDataByName((matchArray[i].substring(1, matchArray[i].length - 1).replace(/\./g, '-') + "-" + rowIndex).trim());
+                        if (field) {
+                            find = true;
+                            Values[matchArray[i]] = field.value || 0;
+                        } else {
+                            var hideValue = getHideFieldValue(matchArray[i].substring(1, matchArray[i].length - 1), rowIndex);
+                            if (hideValue) {
+                                find = true;
+                                Values[matchArray[i]] = hideValue;
+                            }
+                        }
+                    }
+                    if (find) {
+                        for (var f in Values) {
+                            cal = cal.replace(f, Values[f]);
+                        }
+                        try {
+                            result += eval(cal);
+                            rowIndex++;
+                        } catch (ex) {
+                            result = 0;
+                            go = false;
+                            NG.sysLog("表达式错误：" + cal, NG.LogType.JS);
+                        }
+                    } else {
+                        go = false;
+                    }
+                }
+                return result;
+            },
+            getArguments = function (exp) {
+                var b = expStr.indexOf(exp),
+                    e, endIndex = 0, partStr = '', len = 0;
+                if (b > -1) {
+                    b += exp.length;
+                    e = b;
+                    partStr = expStr.substring(b);
+                    len = partStr.length;
+                    for (var i = 0; i < len; i++) {
+                        e++;
+                        if (partStr.charAt(i) == ')') {
+                            if (endIndex == 0) {
+                                break;
+                            } else {
+                                endIndex--;
+                            }
+                        }
+                        if (partStr.charAt(i) == '(') {
+                            endIndex++;
+                        }
+                    }
+                    partStr = expStr.substring(b, e - 1);
+                }
+                return partStr;
+            },
+            calcBasicExp = function (str, basicStr) {
+                var matchArray = basicStr.match(/\{([^\{\}]+)\}/g),
+                    field;
+                if (matchArray) {
+                    for (var i = 0, len = matchArray.length; i < len; i++) {
+                        field = me.getFormDataByName((matchArray[i].substring(1, matchArray[i].length - 1).replace(/\./g, '-') + "-" + expIndex).trim()) || me.getFormDataByName((matchArray[i].substring(1, matchArray[i].length - 1).replace(/\./g, '-') + "-0").trim());
+                        if (field) {
+//                            str = str.replace(matchArray[i], (field.getFormattedValue ? field.getFormattedValue() : field.getValue()) || 0);
+                            str = str.replace(matchArray[i], (field.value) || 0);
+                        } else {
+                            str = str.replace(matchArray[i], getHideFieldValue(matchArray[i].substring(1, matchArray[i].length - 1), expIndex) || 0);
+                        }
+                    }
+                }
+                return str;
+            },
+            getHideFieldValue = function(cid, rIndex) {
+                var tmpArray = cid.trim().split('.'),
+                    groupCode = tmpArray[0],
+                    fieldCode = tmpArray[1];
+                for (var i = 0, n = bizData.length; i < n; i++) {
+                    var block = bizData[i],
+                        dataRows, fieldValues, field;
+                    if (block.GroupCode == groupCode) {
+                        if (block.Type === 0) {
+                            rIndex = 0;
+                        }
+                        dataRows = block.DataRows;
+                        if (dataRows[rIndex]) {
+                            fieldValues = dataRows[rIndex].FieldValueList;
+                            for (var j = 0, m = fieldValues.length; j < m; j++) {
+                                field = fieldValues[j];
+                                if (field.FieldCode == fieldCode) {
+                                    return field.Value;
+                                }
+                            }
+                        }
+                        return null;
+                    }
+                }
+                return null;
+            };
+        var newExpStr = expStr,
+            basicExpStr = expStr,
+            retValue = 0,
+            avgArgs = getArguments('AVG('),
+            sumArgs = getArguments('SUM(');
+        if (sumArgs.length > 0) {
+            newExpStr = newExpStr.replace(sumArgs, "'" + sumArgs + "'");
+            basicExpStr = basicExpStr.replace(sumArgs, '');
+        }
+        if (avgArgs.length > 0) {
+            newExpStr = newExpStr.replace(avgArgs, "'" + avgArgs + "'");
+            basicExpStr = basicExpStr.replace(avgArgs, '');
+        }
+        if ((sumArgs + avgArgs).indexOf("AVG(") > -1 || (sumArgs + avgArgs).indexOf("SUM(") > -1) {
+            NG.sysLog("表达式计算，目前不支持函数嵌套：" + expStr, NG.LogType.JS);
+            return;
+        }
+        try {
+            var valueStr , idx, fixed, len, expr;
+            newExpStr = calcBasicExp(newExpStr, basicExpStr);
+            if(isString){
+                return newExpStr;
+            }
+            (expr = new util.Expression("")).Expression(newExpStr);
+            retValue = expr.Evaluate();
+            if (dLen === null || dLen === undefined) {
+                valueStr = retValue.toString();
+                len = valueStr.length;
+                idx = valueStr.indexOf(".");
+                if (idx > 0) { //浮点数计算不准确的问题
+                    fixed = len - idx - 2;
+                    if (fixed > 5) {
+                        retValue = retValue.toFixed(fixed).toString();
+                        retValue = Number(retValue.replace(/\.?0+$/g, ''));
+                    }
+                }
+            } else {
+                retValue = retValue.toFixed(dLen);
+            }
+        } catch (ex) {
+            retValue = 0;
+            NG.sysLog("表达式计算错误[" + newExpStr + "]，原表达式[" + expStr + "]", NG.LogType.JS);
+        }
+        return isFinite(retValue) ? retValue : '';
     },
 
     //初始化下方操作栏
