@@ -1,3 +1,4 @@
+var Expression = require("Evaluator").Expression;
 function formatTime(date) {
   var year = date.getFullYear()
   var month = date.getMonth() + 1
@@ -49,10 +50,47 @@ function isArray(value) {
     return toString.call(value) === '[object Array]';
 };
 
+function isInteger(obj) {
+    return typeof obj === 'number' && obj%1 === 0;
+}
+
+function clone(obj){
+    var o;
+    switch(typeof obj){
+        case 'undefined': break;
+        case 'string'   : o = obj + '';break;
+        case 'number'   : o = obj - 0;break;
+        case 'boolean'  : o = obj;break;
+        case 'object'   :
+            if(obj === null){
+                o = null;
+            }else{
+                if(obj instanceof Array){
+                    o = [];
+                    for(var i = 0, len = obj.length; i < len; i++){
+                        o.push(clone(obj[i]));
+                    }
+                }else{
+                    o = {};
+                    for(var k in obj){
+                        o[k] = clone(obj[k]);
+                    }
+                }
+            }
+            break;
+        default:
+            o = obj;break;
+    }
+    return o;
+}
+
 module.exports = {
     formatTime: formatTime,
     parseParam: parseParam,
     arrayToString: arrayToString,
     isEmpty: isEmpty,
-    isArray: isArray
+    isArray: isArray,
+    isInteger: isInteger,
+    clone: clone,
+    Expression: Expression
 }
